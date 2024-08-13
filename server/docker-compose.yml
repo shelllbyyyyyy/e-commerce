@@ -1,0 +1,72 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+    networks:
+      - default
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  postgres-primary:
+    image: postgres
+    container_name: postgres-primary
+    ports:
+      - '0.0.0.0:5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: e-commerce
+    volumes:
+      - data_postgres:/var/lib/postgresql/data
+    networks:
+      - default
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - ./apps/auth/.env
+    depends_on:
+      - postgres-primary
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - default
+
+  gateways:
+    build:
+      context: .
+      dockerfile: ./apps/root/Dockerfile
+      target: development
+    command: npm run start:dev root
+    ports:
+      - '4000:4000'
+    env_file:
+      - ./apps/root/.env
+    depends_on:
+      - auth
+      - rabbitmq
+      - postgres-primary
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - default
+
+volumes:
+  data_postgres:
+  rabbitmq_data:
