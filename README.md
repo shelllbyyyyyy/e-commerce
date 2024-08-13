@@ -1,1 +1,1 @@
-Learning microservices with RabbitMQ
+Learning microservices with RabbitMQ and CQRS Pattern

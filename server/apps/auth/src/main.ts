@@ -13,6 +13,9 @@ async function bootstrap() {
   const rmqService = app.get<RmqService>(RmqService);
 
   app.connectMicroservice<RmqOptions>(rmqService.getOptions(AUTH_SERVICE));
+
+  await app.init();
+
   await app.startAllMicroservices();
 }
 

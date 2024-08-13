@@ -1,10 +1,11 @@
-import { Body, Controller, HttpStatus, Inject, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { User } from '@libs/domain';
@@ -52,9 +53,9 @@ export class AuthController {
     status: HttpStatus.NO_CONTENT,
     description: 'Login Successfully',
   })
-  @ApiBadRequestResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Check your email/password',
+  @ApiUnauthorizedResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Wrong email/password',
   })
   async login(
     @Body() dto: LoginDTO,
@@ -63,8 +64,8 @@ export class AuthController {
 
     if (!token)
       return new ApiResponse(
-        HttpStatus.BAD_REQUEST,
-        'Check your email/password',
+        HttpStatus.UNAUTHORIZED,
+        'Wrong email/password',
         token,
       );
 

@@ -1,13 +1,12 @@
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 
 import { User, UserService } from '@libs/domain';
-
 import { BcryptService } from '@libs/shared';
 
-import { LoginCommand } from '../login.command';
+import { LoginCommand } from './login.command';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler
@@ -18,10 +17,7 @@ export class LoginHandler
     private readonly bcrypt: BcryptService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly event: EventBus,
-  ) {
-    console.log('LoginHandler instantiated');
-  }
+  ) {}
 
   async execute(command: LoginCommand): Promise<{ access_token: string }> {
     const { email, password } = command;
@@ -34,8 +30,6 @@ export class LoginHandler
       expiresIn: '1m',
     });
 
-    this.event.publish(access_token);
-
     return {
       access_token: access_token,
     };
@@ -45,15 +39,20 @@ export class LoginHandler
     email: string,
     password: string,
   ): Promise<User> {
-    const user = await this.service.findByEmailWithPassword(email);
-    if (!user) throw new NotFoundException();
+    try {
+      const user = await this.service.findByEmailWithPassword(email);
+      if (!user) throw new NotFoundException('User not found');
 
-    const compare = await this.bcrypt.comparePassword(
-      password,
-      user.getPassword(),
-    );
-    if (!compare) throw new UnauthorizedException('Password not match');
+      const compare = await this.bcrypt.comparePassword(
+        password,
+        user.getPassword(),
+      );
 
-    return user;
+      if (!compare) throw new UnauthorizedException('Password not match');
+
+      return user;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

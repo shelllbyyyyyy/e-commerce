@@ -1,51 +1,81 @@
-import { Body, Controller, HttpStatus } from '@nestjs/common';
-import { Ctx, EventPattern, RmqContext } from '@nestjs/microservices';
+import { Body, Controller, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Ctx,
+  EventPattern,
+  RmqContext,
+  RpcException,
+} from '@nestjs/microservices';
+import { CommandBus } from '@nestjs/cqrs';
 
 import { User } from '@libs/domain';
 import { RmqService } from '@libs/shared';
 
-import { AuthService } from '@/auth/application/services/auth.service';
-
 import { RegisterDTO } from '@/root/auth/dtos/register.dto';
-import { ApiResponse } from '@/root/auth/dtos/api-response.dto';
 import { LoginDTO } from '@/root/auth/dtos/login.dto';
+import { LoginCommand } from '@/auth/application/command/login/login.command';
+import { RegisterUserCommand } from '@/auth/application/command/register/register-user.command';
 
 @Controller()
 export class AuthController {
   constructor(
-    private readonly service: AuthService,
+    private readonly command: CommandBus,
     private readonly rmqService: RmqService,
   ) {}
 
   @EventPattern('register_user')
+  @UsePipes(new ValidationPipe({ transform: true }))
   async handleRegister(
     @Body() dto: RegisterDTO,
     @Ctx() context: RmqContext,
   ): Promise<User> {
     const { email, password, username } = dto;
 
-    const newUser = await this.service.register(username, email, password);
+    const command = new RegisterUserCommand(username, email, password);
 
-    this.rmqService.ack(context);
+    try {
+      const newUser = await this.command.execute<RegisterUserCommand, User>(
+        command,
+      );
 
-    if (!newUser) return;
+      this.rmqService.ack(context);
 
-    return newUser;
+      if (!newUser) return;
+
+      return newUser;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        code: 'INTERNAL_SERVER_ERROR',
+      });
+    }
   }
 
   @EventPattern('login')
+  @UsePipes(new ValidationPipe({ transform: true }))
   async handleLogin(
     @Body() dto: LoginDTO,
     @Ctx() context: RmqContext,
   ): Promise<{ access_token: string }> {
     const { email, password } = dto;
 
-    const token = await this.service.login(email, password);
+    const command = new LoginCommand(email, password);
 
-    this.rmqService.ack(context);
+    try {
+      const token = await this.command.execute<
+        LoginCommand,
+        { access_token: string }
+      >(command);
 
-    if (!token) return;
+      this.rmqService.ack(context);
 
-    return token;
+      if (!token) return;
+
+      return token;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        code: 'INTERNAL_SERVER_ERROR',
+      });
+    }
   }
 }
