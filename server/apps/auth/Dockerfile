@@ -5,6 +5,8 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable
 
+RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
+
 WORKDIR /usr/src/app
 
 COPY pnpm-lock.yaml ./
@@ -15,7 +17,7 @@ RUN pnpm install
 
 COPY . .
 
-RUN pnpm prisma generate --schema=/usr/src/app/prisma/schema.prisma
+RUN pnpm prisma generate
 
 RUN pnpm run build auth
 

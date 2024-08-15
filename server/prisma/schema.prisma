@@ -33,7 +33,7 @@ model Address {
   state             String
   postal_code       String
   country_code      String
-  mapUrl            String?
+  mapUrl           String?
   createdAt         DateTime        @default(now()) @db.Timestamptz(6)
   updatedAt         DateTime        @updatedAt @db.Timestamptz(6)
 

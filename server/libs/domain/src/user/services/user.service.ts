@@ -11,6 +11,10 @@ export class UserService {
     return await this.repository.save(data);
   }
 
+  async findById(id: string): Promise<User> {
+    return await this.repository.findById(id);
+  }
+
   async findByEmail(email: string): Promise<User> {
     return await this.repository.findByEmail(email);
   }

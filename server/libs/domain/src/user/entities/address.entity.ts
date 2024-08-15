@@ -9,7 +9,8 @@ export class Address {
     private readonly state: string,
     private readonly postal_code: string,
     private readonly country_code: string,
-    private readonly maps_url?: string,
+    private readonly userId: string,
+    private readonly mapUrl?: string,
     private readonly createdAt?: Date,
     private readonly updatedAt?: Date,
   ) {
@@ -22,7 +23,8 @@ export class Address {
     this.state = state;
     this.postal_code = postal_code;
     this.country_code = country_code;
-    this.maps_url = maps_url;
+    this.userId = userId;
+    this.mapUrl = mapUrl;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -63,8 +65,12 @@ export class Address {
     return this.country_code;
   }
 
+  getUserId(): string {
+    return this.userId;
+  }
+
   getMapUrl(): string {
-    return this.maps_url;
+    return this.mapUrl;
   }
 
   getCreatedAt(): Date {
@@ -73,5 +79,41 @@ export class Address {
 
   getUpdatedAt(): Date {
     return this.updatedAt;
+  }
+
+  updateAddress({
+    first_name,
+    last_name,
+    phone_number,
+    street,
+    city,
+    state,
+    postal_code,
+    country_code,
+    mapUrl,
+  }: {
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    street: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    country_code: string;
+    mapUrl?: string;
+  }): Address {
+    return new Address(
+      this.id,
+      first_name,
+      last_name,
+      phone_number,
+      street,
+      city,
+      state,
+      postal_code,
+      country_code,
+      this.userId,
+      mapUrl,
+    );
   }
 }

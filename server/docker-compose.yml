@@ -17,16 +17,22 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
 
   postgres-primary:
-    image: postgres
+    image: postgres:13
     container_name: postgres-primary
     ports:
-      - '0.0.0.0:5432:5432'
+      - '5432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: e-commerce
     volumes:
       - data_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
     networks:
       - default
 
@@ -39,8 +45,10 @@ services:
     env_file:
       - ./apps/auth/.env
     depends_on:
-      - postgres-primary
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -58,9 +66,12 @@ services:
     env_file:
       - ./apps/root/.env
     depends_on:
-      - auth
-      - rabbitmq
-      - postgres-primary
+      auth:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -70,3 +81,6 @@ services:
 volumes:
   data_postgres:
   rabbitmq_data:
+
+networks:
+  default:

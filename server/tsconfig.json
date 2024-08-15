@@ -25,6 +25,7 @@
       "@/billing/*": ["apps/billing/src/*"],
       "@/order/*": ["apps/order/src/*"],
       "@/root/*": ["apps/root/src/*"],
+      "@/user/*": ["apps/user/src/*"],
       "@libs/domain": ["libs/domain/src"],
       "@libs/domain/*": ["libs/domain/src/*"]
     }

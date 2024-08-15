@@ -1,7 +1,14 @@
-import { Body, Controller, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import {
   Ctx,
   EventPattern,
+  MessagePattern,
+  Payload,
   RmqContext,
   RpcException,
 } from '@nestjs/microservices';
@@ -12,8 +19,13 @@ import { RmqService } from '@libs/shared';
 
 import { RegisterDTO } from '@/root/auth/dtos/register.dto';
 import { LoginDTO } from '@/root/auth/dtos/login.dto';
+
 import { LoginCommand } from '@/auth/application/command/login/login.command';
+import { RefreshCommand } from '@/auth/application/command/refresh/refresh.command';
 import { RegisterUserCommand } from '@/auth/application/command/register/register-user.command';
+import { LocalAuthGuard } from '@/auth/common/guards/local-auth.guard';
+import { CurrentUser } from '@/auth/common/decorators/current.user.decorator';
+import { JwtAuthGuard } from '@/auth/common/guards/jwt-auth.guard';
 
 @Controller()
 export class AuthController {
@@ -25,7 +37,7 @@ export class AuthController {
   @EventPattern('register_user')
   @UsePipes(new ValidationPipe({ transform: true }))
   async handleRegister(
-    @Body() dto: RegisterDTO,
+    @Payload() dto: RegisterDTO,
     @Ctx() context: RmqContext,
   ): Promise<User> {
     const { email, password, username } = dto;
@@ -50,12 +62,13 @@ export class AuthController {
     }
   }
 
+  @UseGuards(LocalAuthGuard)
   @EventPattern('login')
   @UsePipes(new ValidationPipe({ transform: true }))
   async handleLogin(
-    @Body() dto: LoginDTO,
+    @Payload() dto: LoginDTO,
     @Ctx() context: RmqContext,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ access_token: string; refresh_token: string }> {
     const { email, password } = dto;
 
     const command = new LoginCommand(email, password);
@@ -63,6 +76,32 @@ export class AuthController {
     try {
       const token = await this.command.execute<
         LoginCommand,
+        { access_token: string; refresh_token: string }
+      >(command);
+
+      this.rmqService.ack(context);
+
+      if (!token) return;
+
+      return token;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        code: 'INTERNAL_SERVER_ERROR',
+      });
+    }
+  }
+
+  @EventPattern('refresh')
+  async handleRefresh(
+    @Payload() dto: any,
+    @Ctx() context: RmqContext,
+  ): Promise<{ access_token: string }> {
+    const command = new RefreshCommand(dto);
+
+    try {
+      const token = await this.command.execute<
+        RefreshCommand,
         { access_token: string }
       >(command);
 
@@ -77,5 +116,11 @@ export class AuthController {
         code: 'INTERNAL_SERVER_ERROR',
       });
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @MessagePattern('validate_user')
+  async validateUser(@CurrentUser() user: any) {
+    return user;
   }
 }

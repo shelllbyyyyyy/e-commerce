@@ -6,6 +6,8 @@ RUN corepack enable
 
 WORKDIR /usr/src/app
 
+RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
+
 COPY pnpm-lock.yaml ./
 RUN pnpm fetch
 

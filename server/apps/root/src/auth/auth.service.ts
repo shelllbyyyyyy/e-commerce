@@ -20,9 +20,19 @@ export class AuthService {
     }
   }
 
-  async login(request: LoginDTO): Promise<{ access_token: string }> {
+  async login(
+    request: LoginDTO,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     try {
       return await lastValueFrom(this.rmqClient.send('login', request));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async refresh(request: any): Promise<{ access_token: string }> {
+    try {
+      return await lastValueFrom(this.rmqClient.send('refresh', request));
     } catch (error) {
       console.log(error);
     }

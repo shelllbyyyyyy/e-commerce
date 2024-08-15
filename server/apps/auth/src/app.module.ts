@@ -12,6 +12,7 @@ import { HttpModule } from './presentation/controller/http.module';
       isGlobal: true,
       validationSchema: Joi.object({
         ACCESS_TOKEN_SECRET: Joi.string().required(),
+        REFRESH_TOKEN_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.string().required(),
         DATABASE_URL: Joi.string().required(),
       }),
