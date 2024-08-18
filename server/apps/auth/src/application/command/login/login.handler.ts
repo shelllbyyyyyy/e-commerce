@@ -25,7 +25,7 @@ export class LoginHandler
     const { email, password } = command;
 
     const user = await this.service.validateUserCredentials(email, password);
-    const payload = { name: user.getUsername(), sub: user.getId() };
+    const payload = { email: user.getEmail(), sub: user.getId() };
 
     const access_token = this.jwtService.sign(payload, {
       secret: this.configService.get('ACCESS_TOKEN_SECRET'),

@@ -18,20 +18,16 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<User> {
-    try {
-      const user = await this.service.findByEmailWithPassword(email);
-      if (!user) throw new NotFoundException('User not found');
+    const user = await this.service.findByEmailWithPassword(email);
+    if (!user) throw new NotFoundException('User not found');
 
-      const compare = await this.bcrypt.comparePassword(
-        password,
-        user.getPassword(),
-      );
+    const compare = await this.bcrypt.comparePassword(
+      password,
+      user.getPassword(),
+    );
 
-      if (!compare) throw new UnauthorizedException('Password not match');
+    if (!compare) throw new UnauthorizedException('Password not match');
 
-      return user;
-    } catch (error) {
-      console.log(error);
-    }
+    return user;
   }
 }

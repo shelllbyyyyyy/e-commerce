@@ -55,6 +55,25 @@ export class UserRepositoryImpl implements UserRepository {
     return UserMapper.toDomain(update);
   }
 
+  async deleteById(id: string): Promise<boolean> {
+    const deleted = await this.service.user.delete({ where: { id } });
+
+    if (!deleted) return false;
+
+    return true;
+  }
+
+  async updateById(data: User): Promise<User> {
+    const payload: Prisma.UserUpdateInput = { ...data };
+
+    const update = await this.service.user.update({
+      where: { id: data.getId() },
+      data: payload,
+    });
+
+    return UserMapper.toDomain(update);
+  }
+
   async delete(email: string): Promise<void> {
     await this.service.user.delete({ where: { email } });
   }

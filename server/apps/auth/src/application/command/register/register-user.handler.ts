@@ -6,6 +6,7 @@ import { User, UserService } from '@libs/domain';
 import { BcryptService } from '@libs/shared';
 
 import { RegisterUserCommand } from './register-user.command';
+import { RpcException } from '@nestjs/microservices';
 
 @CommandHandler(RegisterUserCommand)
 export class RegisterUserHandler
@@ -35,7 +36,9 @@ export class RegisterUserHandler
 
       return register;
     } catch (error) {
-      console.log(error);
+      throw new RpcException(
+        new UnprocessableEntityException('Email already registered'),
+      );
     }
   }
 }

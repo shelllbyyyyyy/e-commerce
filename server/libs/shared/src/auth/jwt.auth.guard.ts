@@ -5,7 +5,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, Observable, tap } from 'rxjs';
 import { AUTH_SERVICE } from '../rmq/services';
 
@@ -26,7 +26,9 @@ export class JwtAuthGuard implements CanActivate {
           this.addUser(res, context);
         }),
         catchError(() => {
-          throw new UnauthorizedException();
+          throw new RpcException(
+            new UnauthorizedException('To access this you have to login first'),
+          );
         }),
       );
   }
@@ -40,8 +42,8 @@ export class JwtAuthGuard implements CanActivate {
         .cookies?.access_token;
     }
     if (!authentication) {
-      throw new UnauthorizedException(
-        'No value was provided for Authentication',
+      throw new RpcException(
+        new UnauthorizedException('To access this you have to login first'),
       );
     }
 

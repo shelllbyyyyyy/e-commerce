@@ -1,5 +1,9 @@
 import {
+  BadRequestException,
   Controller,
+  HttpStatus,
+  UnauthorizedException,
+  UseFilters,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -15,7 +19,7 @@ import {
 import { CommandBus } from '@nestjs/cqrs';
 
 import { User } from '@libs/domain';
-import { RmqService } from '@libs/shared';
+import { RmqService, RpcExceptionFilter } from '@libs/shared';
 
 import { RegisterDTO } from '@/root/auth/dtos/register.dto';
 import { LoginDTO } from '@/root/auth/dtos/login.dto';
@@ -28,6 +32,7 @@ import { CurrentUser } from '@/auth/common/decorators/current.user.decorator';
 import { JwtAuthGuard } from '@/auth/common/guards/jwt-auth.guard';
 
 @Controller()
+@UseFilters(new RpcExceptionFilter())
 export class AuthController {
   constructor(
     private readonly command: CommandBus,
@@ -51,14 +56,11 @@ export class AuthController {
 
       this.rmqService.ack(context);
 
-      if (!newUser) return;
-
       return newUser;
     } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        code: 'INTERNAL_SERVER_ERROR',
-      });
+      throw new RpcException(
+        new BadRequestException('Email already registered'),
+      );
     }
   }
 
@@ -81,14 +83,11 @@ export class AuthController {
 
       this.rmqService.ack(context);
 
-      if (!token) return;
-
       return token;
     } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        code: 'INTERNAL_SERVER_ERROR',
-      });
+      throw new RpcException(
+        new UnauthorizedException('Check your email/password'),
+      );
     }
   }
 
@@ -107,14 +106,9 @@ export class AuthController {
 
       this.rmqService.ack(context);
 
-      if (!token) return;
-
       return token;
     } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        code: 'INTERNAL_SERVER_ERROR',
-      });
+      new RpcException(new UnauthorizedException('Refresh token expired'));
     }
   }
 
