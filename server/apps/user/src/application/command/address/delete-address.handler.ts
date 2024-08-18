@@ -3,6 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { AddressService, UserService } from '@libs/domain';
 
 import { DeleteAddressCommand } from './delete-address.command';
+import { RpcException } from '@nestjs/microservices';
 
 @CommandHandler(DeleteAddressCommand)
 export class DeleteAddressHandler
@@ -20,7 +21,7 @@ export class DeleteAddressHandler
 
       return deleteProfile;
     } catch (error) {
-      console.log(error);
+      throw new RpcException(error);
     }
   }
 }

@@ -27,7 +27,15 @@ export class UserService {
     return await this.repository.update(data);
   }
 
+  async updateById(data: User): Promise<User> {
+    return await this.repository.updateById(data);
+  }
+
   async delete(email: string): Promise<void> {
     return await this.repository.delete(email);
+  }
+
+  async deleteById(id: string): Promise<boolean> {
+    return await this.repository.deleteById(id);
   }
 }

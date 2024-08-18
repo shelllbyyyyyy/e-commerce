@@ -4,6 +4,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Address, AddressService } from '@libs/domain';
 
 import { UpdateAddressCommand } from './update-address.command';
+import { RpcException } from '@nestjs/microservices';
 
 @CommandHandler(UpdateAddressCommand)
 export class UpdateAddressHandler
@@ -43,7 +44,7 @@ export class UpdateAddressHandler
 
       return updateProfile;
     } catch (error) {
-      console.log(error);
+      throw new RpcException(error);
     }
   }
 }

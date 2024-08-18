@@ -1,4 +1,12 @@
-import { Body, Controller, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UseFilters,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -29,32 +37,22 @@ export class AuthController {
   })
   @ApiBadRequestResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Something Wrong',
+    description: 'Email already registered',
   })
-  async register(
-    @Body() dto: RegisterDTO,
-    @Res() res: Response,
-  ): Promise<ApiResponse<User>> {
+  async register(@Body() dto: RegisterDTO, @Res() res: Response) {
     const newUser = await this.service.register(dto);
 
-    if (!newUser)
-      return new ApiResponse(
-        HttpStatus.BAD_REQUEST,
-        'Something Wrong',
-        newUser,
+    res
+      .status(HttpStatus.CREATED)
+      .json(
+        new ApiResponse(HttpStatus.CREATED, 'Register successfully', newUser),
       );
-
-    return new ApiResponse(
-      HttpStatus.CREATED,
-      'Register successfully',
-      newUser,
-    );
   }
 
   @Post('login')
   @ApiBody({ type: LoginDTO })
   @ApiNoContentResponse({
-    status: HttpStatus.NO_CONTENT,
+    status: HttpStatus.OK,
     description: 'Login Successfully',
   })
   @ApiUnauthorizedResponse({
@@ -64,7 +62,7 @@ export class AuthController {
   async login(
     @Body() dto: LoginDTO,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<ApiResponse<string>> {
+  ) {
     const result = await this.service.login(dto);
 
     res.cookie('access_token', result.access_token, {
@@ -79,18 +77,9 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    if (!result)
-      return new ApiResponse(
-        HttpStatus.UNAUTHORIZED,
-        'Wrong email/password',
-        'Please try again',
-      );
-
-    return new ApiResponse(
-      HttpStatus.NO_CONTENT,
-      'Login Successfully',
-      '🔥🔥🔥🔥🔥',
-    );
+    res
+      .status(HttpStatus.OK)
+      .json(new ApiResponse(HttpStatus.OK, 'Login Successfully', '🔥🔥🔥🔥🔥'));
   }
 
   @Post('refresh')
@@ -102,29 +91,10 @@ export class AuthController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'No refresh token provided',
   })
-  async refresh(
-    @Req() req: Request,
-    @Res() res: Response,
-  ): Promise<ApiResponse<string>> {
+  async refresh(@Req() req: Request, @Res() res: Response) {
     const refreshToken = req.cookies['refresh_token'];
 
-    if (!refreshToken) {
-      return new ApiResponse(
-        HttpStatus.UNAUTHORIZED,
-        'No refresh token provided',
-        '👀',
-      );
-    }
-
     const data = await this.service.refresh(refreshToken);
-
-    if (!data) {
-      return new ApiResponse(
-        HttpStatus.UNAUTHORIZED,
-        'No refresh token provided',
-        '👀',
-      );
-    }
 
     res.cookie('access_token', data.access_token, {
       httpOnly: true,
@@ -139,5 +109,17 @@ export class AuthController {
         '🔥🔥🔥🔥',
       ),
     );
+  }
+
+  @Post('logout')
+  @ApiNoContentResponse({
+    status: HttpStatus.OK,
+    description: 'Logout success',
+  })
+  async logout(@Res() res: Response) {
+    res.cookie('access_token', '');
+    res.cookie('refresh_token', '');
+
+    res.json(new ApiResponse(HttpStatus.OK, 'Logout success', '🔥🔥🔥🔥'));
   }
 }

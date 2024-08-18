@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom } from 'rxjs';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { catchError, lastValueFrom, throwError } from 'rxjs';
 
 import { User } from '@libs/domain';
 import { AUTH_SERVICE } from '@libs/shared';
@@ -14,9 +14,17 @@ export class AuthService {
 
   async register(request: RegisterDTO): Promise<User> {
     try {
-      return await lastValueFrom(this.rmqClient.send('register_user', request));
+      return await lastValueFrom(
+        this.rmqClient
+          .send('register_user', request)
+          .pipe(
+            catchError((error) => throwError(() => new RpcException(error))),
+          ),
+      );
     } catch (error) {
-      console.log(error);
+      if (error instanceof RpcException) {
+        throw error;
+      }
     }
   }
 
@@ -24,17 +32,33 @@ export class AuthService {
     request: LoginDTO,
   ): Promise<{ access_token: string; refresh_token: string }> {
     try {
-      return await lastValueFrom(this.rmqClient.send('login', request));
+      return await lastValueFrom(
+        this.rmqClient
+          .send('login', request)
+          .pipe(
+            catchError((error) => throwError(() => new RpcException(error))),
+          ),
+      );
     } catch (error) {
-      console.log(error);
+      if (error instanceof RpcException) {
+        throw error;
+      }
     }
   }
 
   async refresh(request: any): Promise<{ access_token: string }> {
     try {
-      return await lastValueFrom(this.rmqClient.send('refresh', request));
+      return await lastValueFrom(
+        this.rmqClient
+          .send('refresh', request)
+          .pipe(
+            catchError((error) => throwError(() => new RpcException(error))),
+          ),
+      );
     } catch (error) {
-      console.log(error);
+      if (error instanceof RpcException) {
+        throw error;
+      }
     }
   }
 }

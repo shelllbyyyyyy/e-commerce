@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { UserService } from './user.service';
-import { UserController } from './user.controller';
 import { RmqModule, USER_SERVICE } from '@libs/shared';
+import { UserController } from './user.controller';
+import { UserService } from './user.service';
+import { AddressModule } from './address/address.module';
+import { AddressController } from './address/address.controller';
+import { AddressService } from './address/address.service';
 
 @Module({
   imports: [
@@ -10,7 +13,7 @@ import { RmqModule, USER_SERVICE } from '@libs/shared';
       name: USER_SERVICE,
     }),
   ],
-  controllers: [UserController],
-  providers: [UserService],
+  controllers: [UserController, AddressController],
+  providers: [UserService, AddressService],
 })
 export class UserModule {}

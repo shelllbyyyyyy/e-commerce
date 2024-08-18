@@ -76,4 +76,24 @@ export class User {
   getOrder(): string {
     return this.order;
   }
+
+  updateUser({
+    display_name,
+    profile_picture,
+    phone_number,
+  }: {
+    display_name: string;
+    profile_picture: string;
+    phone_number: string;
+  }): User {
+    return new User(
+      this.id,
+      this.username,
+      this.email,
+      this.password,
+      display_name,
+      profile_picture,
+      phone_number,
+    );
+  }
 }

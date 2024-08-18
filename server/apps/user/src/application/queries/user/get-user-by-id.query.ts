@@ -1,3 +1,3 @@
-export class FindAddressQuery {
+export class GetUserByIdQuery {
   constructor(public readonly id: string) {}
 }

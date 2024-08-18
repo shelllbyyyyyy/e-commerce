@@ -1,4 +1,10 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  NotFoundException,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   Ctx,
@@ -8,18 +14,23 @@ import {
   RpcException,
 } from '@nestjs/microservices';
 
-import { Address } from '@libs/domain';
-import { JwtAuthGuard, RmqService } from '@libs/shared';
+import { User } from '@libs/domain';
+import {
+  JwtAuthGuard,
+  RmqService,
+  RpcExceptionFilter,
+  RpcRequestHandler,
+} from '@libs/shared';
 
-import { AddAddressDTO } from '@/root/user/dtos/add-address.dto';
-import { UpdateAddressDTO } from '@/root/user/dtos/update-address.dto';
-import { AddAddressCommand } from '@/user/application/command/address/add-address.command';
-import { UpdateAddressCommand } from '@/user/application/command/address/update-address.command';
-import { DeleteAddressCommand } from '@/user/application/command/address/delete-address.command';
-import { FindAddressByUserQuery } from '@/user/application/queries/address/find-address-by-user.query';
-import { FindAddressQuery } from '@/user/application/queries/address/find-address.query';
+import { UpdateUserDTO } from '@/root/user/dtos/update-user.dto';
 
-@Controller()
+import { GetUserQuery } from '@/user/application/queries/user/get-user.query';
+import { GetUserByIdQuery } from '@/user/application/queries/user/get-user-by-id.query';
+import { UpdateUserCommand } from '@/user/application/command/user/update-user.command';
+import { DeleteUserCommand } from '@/user/application/command/user/delete-user.command';
+
+@Controller('user')
+@UseFilters(new RpcExceptionFilter())
 export class UserController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -28,179 +39,88 @@ export class UserController {
   ) {}
 
   @UseGuards(JwtAuthGuard)
-  @MessagePattern('add_address')
-  async handleAddAddress(
-    @Payload() data: { request: AddAddressDTO; user: any },
-    @Ctx() context: RmqContext,
-  ) {
-    const {
-      first_name,
-      last_name,
-      city,
-      country_code,
-      phone_number,
-      postal_code,
-      state,
-      street,
-      mapUrl,
-    } = data.request;
+  @MessagePattern('get_user_by_id')
+  async handleGetUserById(@Payload() data: any, @Ctx() context: RmqContext) {
+    const rpc = RpcRequestHandler.execute(data);
 
-    const user = data.user;
+    const id = rpc.param;
 
-    const command = new AddAddressCommand(
+    const query = new GetUserByIdQuery(id);
+
+    try {
+      const user = await this.queryBus.execute<GetUserByIdQuery, User>(query);
+
+      this.rmqService.ack(context);
+
+      return user;
+    } catch (error) {
+      throw new RpcException(new NotFoundException('User not found'));
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @MessagePattern('get_user')
+  async handleGetUser(@Payload() data: any, @Ctx() context: RmqContext) {
+    const rpc = RpcRequestHandler.execute(data);
+    const user = rpc.user;
+
+    const query = new GetUserQuery(user.sub);
+
+    try {
+      const user = await this.queryBus.execute<GetUserQuery, User>(query);
+
+      this.rmqService.ack(context);
+
+      return user;
+    } catch (error) {
+      throw new RpcException(new BadRequestException('Something wrong'));
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @MessagePattern('update_user')
+  async handleUpdateUser(@Payload() data: any, @Ctx() context: RmqContext) {
+    const rpc = RpcRequestHandler.execute<UpdateUserDTO>(data);
+    const { display_name, phone_number, profile_picture } = rpc.request;
+    const user = rpc.user;
+
+    const command = new UpdateUserCommand(
       user.sub,
-      first_name,
-      last_name,
+      display_name,
       phone_number,
-      street,
-      city,
-      state,
-      postal_code,
-      country_code,
-      mapUrl,
+      profile_picture,
     );
 
     try {
-      const newAddress = await this.commandBus.execute<
-        AddAddressCommand,
-        Address
-      >(command);
-
-      this.rmqService.ack(context);
-
-      if (!newAddress) return;
-
-      return newAddress;
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        code: 'INTERNAL_SERVER_ERROR',
-      });
-    }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @MessagePattern('update_address')
-  async handleUpdateAddress(
-    @Payload() data: { request: UpdateAddressDTO; param: any },
-    @Ctx() context: RmqContext,
-  ) {
-    const {
-      first_name,
-      last_name,
-      city,
-      country_code,
-      phone_number,
-      postal_code,
-      state,
-      street,
-      mapUrl,
-    } = data.request;
-
-    const id = data.param as string;
-
-    const command = new UpdateAddressCommand(
-      id,
-      first_name,
-      last_name,
-      phone_number,
-      street,
-      city,
-      state,
-      postal_code,
-      country_code,
-      mapUrl,
-    );
-
-    try {
-      const newAddress = await this.commandBus.execute<
-        UpdateAddressCommand,
-        Address
-      >(command);
-
-      this.rmqService.ack(context);
-
-      if (!newAddress) return;
-
-      return newAddress;
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        code: 'INTERNAL_SERVER_ERROR',
-      });
-    }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @MessagePattern('delete_address')
-  async handleDeleteAddress(
-    @Payload() data: { id: string },
-    @Ctx() context: RmqContext,
-  ) {
-    const command = new DeleteAddressCommand(data.id);
-
-    try {
-      const newAddress = await this.commandBus.execute<
-        DeleteAddressCommand,
-        Address
-      >(command);
-
-      this.rmqService.ack(context);
-
-      if (!newAddress) return;
-
-      return newAddress;
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        code: 'INTERNAL_SERVER_ERROR',
-      });
-    }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @MessagePattern('get_address_by_user')
-  async handleGetByUserAddress(
-    @Payload() data: { user: any },
-    @Ctx() context: RmqContext,
-  ) {
-    const user = data.user;
-    try {
-      const getAddress = await this.queryBus.execute<
-        FindAddressByUserQuery,
-        Address[]
-      >(new FindAddressByUserQuery(user.sub));
-
-      this.rmqService.ack(context);
-
-      return getAddress;
-    } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        code: 'INTERNAL_SERVER_ERROR',
-      });
-    }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @MessagePattern('get_address')
-  async handleGetAddress(
-    @Payload() data: { id: string },
-    @Ctx() context: RmqContext,
-  ) {
-    try {
-      const getAddress = await this.queryBus.execute<FindAddressQuery, Address>(
-        new FindAddressQuery(data.id),
+      const updateUser = await this.commandBus.execute<UpdateUserCommand, User>(
+        command,
       );
 
       this.rmqService.ack(context);
 
-      return getAddress;
+      return updateUser;
     } catch (error) {
-      throw new RpcException({
-        message: error.message,
-        code: 'INTERNAL_SERVER_ERROR',
-      });
+      throw new RpcException(new BadRequestException('Update user failed'));
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @MessagePattern('delete_user')
+  async handleDeleteUser(@Payload() data: any, @Ctx() context: RmqContext) {
+    const rpc = RpcRequestHandler.execute(data);
+    const command = new DeleteUserCommand(rpc.param);
+
+    try {
+      const newAddress = await this.commandBus.execute<
+        DeleteUserCommand,
+        boolean
+      >(command);
+
+      this.rmqService.ack(context);
+
+      return newAddress;
+    } catch (error) {
+      throw new RpcException(new BadRequestException('Delete user failed'));
     }
   }
 }

@@ -60,7 +60,7 @@ export class AddressRepositoryImpl implements AddressRepository {
       },
     });
 
-    if (!user) return;
+    if (user.address.length === 0) return;
 
     return user.address.map((value) => AddressMapper.toDomain(value));
   }

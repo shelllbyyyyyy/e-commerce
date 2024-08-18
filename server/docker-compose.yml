@@ -55,6 +55,25 @@ services:
     networks:
       - default
 
+  user:
+    build:
+      context: .
+      dockerfile: ./apps/user/Dockerfile
+      target: development
+    command: npm run start:dev user
+    env_file:
+      - ./apps/user/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - default
+
   gateways:
     build:
       context: .
@@ -67,6 +86,8 @@ services:
       - ./apps/root/.env
     depends_on:
       auth:
+        condition: service_started
+      user:
         condition: service_started
       rabbitmq:
         condition: service_healthy

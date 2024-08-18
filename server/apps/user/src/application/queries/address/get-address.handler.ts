@@ -3,14 +3,15 @@ import { NotFoundException } from '@nestjs/common';
 
 import { Address, AddressService } from '@libs/domain';
 
-import { FindAddressQuery } from './find-address.query';
+import { GetAddressQuery } from './get-address.query';
+import { RpcException } from '@nestjs/microservices';
 
-@QueryHandler(FindAddressQuery)
-export class FindAddressHandler
-  implements IQueryHandler<FindAddressQuery, Address>
+@QueryHandler(GetAddressQuery)
+export class GetAddressHandler
+  implements IQueryHandler<GetAddressQuery, Address>
 {
   constructor(private readonly service: AddressService) {}
-  async execute(query: FindAddressQuery): Promise<Address> {
+  async execute(query: GetAddressQuery): Promise<Address> {
     const { id } = query;
     try {
       const address = await this.service.findById(id);
@@ -19,7 +20,7 @@ export class FindAddressHandler
 
       return address;
     } catch (error) {
-      console.log(error);
+      throw new RpcException(new NotFoundException('Address not found'));
     }
   }
 }

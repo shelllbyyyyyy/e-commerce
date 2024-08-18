@@ -3,96 +3,13 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, lastValueFrom, throwError } from 'rxjs';
 
 import { USER_SERVICE } from '@libs/shared';
-import { Address, User } from '@libs/domain';
-import { UpdateUserDTO } from './dtos/update-user.dto';
-import { UpdateAddressDTO } from './dtos/update-address.dto';
-import { AddAddressDTO } from './dtos/add-address.dto';
+import { Address } from '@libs/domain';
+import { AddAddressDTO } from '../dtos/add-address.dto';
+import { UpdateAddressDTO } from '../dtos/update-address.dto';
 
 @Injectable()
-export class UserService {
+export class AddressService {
   constructor(@Inject(USER_SERVICE) private rmqClient: ClientProxy) {}
-
-  async getUserById(param: string, authentication: string): Promise<User> {
-    try {
-      const result = await lastValueFrom(
-        this.rmqClient
-          .send('get_user_by_id', {
-            param,
-            access_token: authentication,
-          })
-          .pipe(
-            catchError((error) => throwError(() => new RpcException(error))),
-          ),
-      );
-      return result;
-    } catch (error) {
-      if (error instanceof RpcException) {
-        throw error;
-      }
-    }
-  }
-
-  async getUser(authentication: string): Promise<User> {
-    try {
-      const result = await lastValueFrom(
-        this.rmqClient
-          .send<User>('get_user', {
-            access_token: authentication,
-          })
-          .pipe(
-            catchError((error) => throwError(() => new RpcException(error))),
-          ),
-      );
-      return result;
-    } catch (error) {
-      if (error instanceof RpcException) {
-        throw error;
-      }
-    }
-  }
-
-  async updateUser(
-    request: UpdateUserDTO,
-    authentication: string,
-  ): Promise<User> {
-    try {
-      const result = await lastValueFrom(
-        this.rmqClient
-          .send('update_user', {
-            request,
-            access_token: authentication,
-          })
-          .pipe(
-            catchError((error) => throwError(() => new RpcException(error))),
-          ),
-      );
-      return result;
-    } catch (error) {
-      if (error instanceof RpcException) {
-        throw error;
-      }
-    }
-  }
-
-  async deleteUser(param: string, authentication: string): Promise<boolean> {
-    try {
-      const result = await lastValueFrom(
-        this.rmqClient
-          .send('delete_user', {
-            param,
-            access_token: authentication,
-          })
-          .pipe(
-            catchError((error) => throwError(() => new RpcException(error))),
-          ),
-      );
-      return result;
-    } catch (error) {
-      if (error instanceof RpcException) {
-        throw error;
-      }
-    }
-  }
 
   async addAddress(
     request: AddAddressDTO,

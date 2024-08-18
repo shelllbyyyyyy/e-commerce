@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import { Address, AddressService, UserService } from '@libs/domain';
 
 import { AddAddressCommand } from './add-address.command';
+import { RpcException } from '@nestjs/microservices';
 
 @CommandHandler(AddAddressCommand)
 export class AddAddressHandler
@@ -49,7 +50,7 @@ export class AddAddressHandler
     try {
       return await this.addressService.save(user.getId(), newAddress);
     } catch (error) {
-      console.log(error);
+      throw new RpcException(error);
     }
   }
 }
