@@ -6,6 +6,9 @@ export * from './common/request/rpc.request.handler';
 export * from './common/exceptions/gateway.exceptions.filter';
 export * from './common/exceptions/rpc.exceptions.filter';
 
+export * from './mailer/mailer.module';
+export * from './mailer/mailer.service';
+
 export * from './prisma/prisma.service';
 
 export * from './rmq/rmq.module';

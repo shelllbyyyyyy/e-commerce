@@ -5,8 +5,17 @@
   "root": "apps/root",
   "monorepo": true,
   "compilerOptions": {
-    "webpack": false,
-    "tsConfigPath": "apps/root/tsconfig.app.json"
+    "webpack": true,
+    "tsConfigPath": "apps/root/tsconfig.app.json",
+    "assets": [
+      {
+        "include": "../../../libs/shared/src/mailer/templates/**/*.ejs",
+        "outDir": "dist/apps/root",
+        "watchAssets": true
+      }
+    ],
+    "watchAssets": true,
+    "deleteOutDir": true
   },
   "projects": {
     "product": {
@@ -15,7 +24,15 @@
       "entryFile": "main",
       "sourceRoot": "apps/product/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/product/tsconfig.app.json"
+        "tsConfigPath": "apps/product/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "../../../libs/shared/src/mailer/templates/**/*.ejs",
+            "outDir": "dist/apps/product",
+            "watchAssets": true
+          }
+        ],
+        "watchAssets": true
       }
     },
     "auth": {
@@ -24,7 +41,15 @@
       "entryFile": "main",
       "sourceRoot": "apps/auth/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/auth/tsconfig.app.json"
+        "tsConfigPath": "apps/auth/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "../../../libs/shared/src/mailer/templates/**/*.ejs",
+            "outDir": "dist/apps/auth",
+            "watchAssets": true
+          }
+        ],
+        "watchAssets": true
       }
     },
     "root": {
@@ -33,7 +58,15 @@
       "entryFile": "main",
       "sourceRoot": "apps/root/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/root/tsconfig.app.json"
+        "tsConfigPath": "apps/root/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "../../../libs/shared/src/mailer/templates/**/*.ejs",
+            "outDir": "dist/apps/root",
+            "watchAssets": true
+          }
+        ],
+        "watchAssets": true
       }
     },
     "user": {
@@ -42,7 +75,15 @@
       "entryFile": "main",
       "sourceRoot": "apps/user/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/user/tsconfig.app.json"
+        "tsConfigPath": "apps/user/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "../../../libs/shared/src/mailer/templates/**/*.ejs",
+            "outDir": "dist/apps/user",
+            "watchAssets": true
+          }
+        ],
+        "watchAssets": true
       }
     },
     "shared": {
