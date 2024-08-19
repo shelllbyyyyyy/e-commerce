@@ -61,4 +61,36 @@ export class AuthService {
       }
     }
   }
+
+  async verifyUser(param: string): Promise<boolean> {
+    try {
+      return await lastValueFrom(
+        this.rmqClient
+          .send('verify_user', param)
+          .pipe(
+            catchError((error) => throwError(() => new RpcException(error))),
+          ),
+      );
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+    }
+  }
+
+  async resendVerification(param: string): Promise<boolean> {
+    try {
+      return await lastValueFrom(
+        this.rmqClient
+          .send('resend_verification', param)
+          .pipe(
+            catchError((error) => throwError(() => new RpcException(error))),
+          ),
+      );
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+    }
+  }
 }

@@ -16,7 +16,7 @@ import {
   RmqContext,
   RpcException,
 } from '@nestjs/microservices';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { User } from '@libs/domain';
 import { RmqService, RpcExceptionFilter } from '@libs/shared';
@@ -27,6 +27,9 @@ import { LoginDTO } from '@/root/auth/dtos/login.dto';
 import { LoginCommand } from '@/auth/application/command/login/login.command';
 import { RefreshCommand } from '@/auth/application/command/refresh/refresh.command';
 import { RegisterUserCommand } from '@/auth/application/command/register/register-user.command';
+import { ResendVerificationQuery } from '@/auth/application/queries/resend-verification/resend-varification.query';
+import { VerifyUserCommand } from '@/auth/application/command/verify-user/verify-user.command';
+
 import { LocalAuthGuard } from '@/auth/common/guards/local-auth.guard';
 import { CurrentUser } from '@/auth/common/decorators/current.user.decorator';
 import { JwtAuthGuard } from '@/auth/common/guards/jwt-auth.guard';
@@ -36,6 +39,7 @@ import { JwtAuthGuard } from '@/auth/common/guards/jwt-auth.guard';
 export class AuthController {
   constructor(
     private readonly command: CommandBus,
+    private readonly query: QueryBus,
     private readonly rmqService: RmqService,
   ) {}
 
@@ -109,6 +113,49 @@ export class AuthController {
       return token;
     } catch (error) {
       new RpcException(new UnauthorizedException('Refresh token expired'));
+    }
+  }
+
+  @EventPattern('verify_user')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async handleVerify(
+    @Payload() param: string,
+    @Ctx() context: RmqContext,
+  ): Promise<boolean> {
+    const command = new VerifyUserCommand(param);
+
+    try {
+      const verified = await this.command.execute<VerifyUserCommand, boolean>(
+        command,
+      );
+
+      this.rmqService.ack(context);
+
+      return verified;
+    } catch (error) {
+      throw new RpcException(new BadRequestException('Token has expired'));
+    }
+  }
+
+  @EventPattern('resend_verification')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async handleResend(
+    @Payload() param: string,
+    @Ctx() context: RmqContext,
+  ): Promise<boolean> {
+    const query = new ResendVerificationQuery(param);
+
+    try {
+      const verified = await this.query.execute<
+        ResendVerificationQuery,
+        boolean
+      >(query);
+
+      this.rmqService.ack(context);
+
+      return verified;
+    } catch (error) {
+      throw new RpcException(new BadRequestException('User not found'));
     }
   }
 

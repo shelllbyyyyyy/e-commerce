@@ -1,12 +1,17 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { ConfigService } from '@nestjs/config';
+import { RpcException } from '@nestjs/microservices';
+import { JwtService } from '@nestjs/jwt';
 
 import { User, UserService } from '@libs/domain';
-import { BcryptService } from '@libs/shared';
+import { BcryptService, EmailService } from '@libs/shared';
 
 import { RegisterUserCommand } from './register-user.command';
-import { RpcException } from '@nestjs/microservices';
 
 @CommandHandler(RegisterUserCommand)
 export class RegisterUserHandler
@@ -15,6 +20,9 @@ export class RegisterUserHandler
   constructor(
     private readonly service: UserService,
     private readonly bcrypt: BcryptService,
+    private readonly sendEmail: EmailService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async execute(command: RegisterUserCommand): Promise<User> {
@@ -30,14 +38,24 @@ export class RegisterUserHandler
 
       const hashPassword = await this.bcrypt.hashPassword(password);
 
-      const newUser = new User(id, username, email, hashPassword);
+      const newUser = new User(id, username, email, hashPassword, false);
 
       const register = await this.service.save(newUser);
+
+      if (register) {
+        const payload = { sub: register.getId() };
+
+        const token = await this.jwtService.signAsync(payload, {
+          expiresIn: '1m',
+          secret: this.configService.get<string>('VERIFY_TOKEN_SECRET'),
+        });
+        await this.sendEmail.sendUserWelcome(newUser, token);
+      }
 
       return register;
     } catch (error) {
       throw new RpcException(
-        new UnprocessableEntityException('Email already registered'),
+        new BadRequestException('Email already been registered'),
       );
     }
   }

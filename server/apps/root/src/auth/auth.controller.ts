@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   HttpStatus,
+  Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -12,12 +14,12 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiNoContentResponse,
+  ApiOkResponse,
+  ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-
-import { User } from '@libs/domain';
 
 import { RegisterDTO } from './dtos/register.dto';
 import { ApiResponse } from './dtos/api-response.dto';
@@ -121,5 +123,52 @@ export class AuthController {
     res.cookie('refresh_token', '');
 
     res.json(new ApiResponse(HttpStatus.OK, 'Logout success', '🔥🔥🔥🔥'));
+  }
+
+  @Patch('verify-user/:token')
+  @ApiParam({ name: 'token' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Account has been verified',
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Token has expiren',
+  })
+  async verifyUser(@Param('token') token: string, @Res() res: Response) {
+    const verify = await this.service.verifyUser(token);
+
+    res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(HttpStatus.OK, 'Account has been verified', verify),
+      );
+  }
+
+  @Post('resend-verification/:email')
+  @ApiParam({ name: 'email' })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'The Verification link has been sent to your email',
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Email already registered',
+  })
+  async resendVerification(
+    @Param('email') email: string,
+    @Res() res: Response,
+  ) {
+    const verify = await this.service.resendVerification(email);
+
+    res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(
+          HttpStatus.OK,
+          'The Verification link has been sent to your email',
+          verify,
+        ),
+      );
   }
 }

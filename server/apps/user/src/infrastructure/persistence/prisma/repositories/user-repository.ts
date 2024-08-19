@@ -44,6 +44,16 @@ export class UserRepositoryImpl implements UserRepository {
     return UserMapper.toDomainWithPassword(user);
   }
 
+  async verifyUser(id: string): Promise<boolean> {
+    const verify = await this.service.user.update({
+      where: { id },
+      data: { isVerified: true },
+    });
+
+    if (verify) return true;
+    return false;
+  }
+
   async update(data: User): Promise<User> {
     const payload: Prisma.UserUpdateInput = { ...data };
 

@@ -23,6 +23,10 @@ export class UserService {
     return await this.repository.findByEmailWithPassword(email);
   }
 
+  async verifyUser(id: string): Promise<boolean> {
+    return await this.repository.verifyUser(id);
+  }
+
   async update(data: User): Promise<User> {
     return await this.repository.update(data);
   }

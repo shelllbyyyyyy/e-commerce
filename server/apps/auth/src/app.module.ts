@@ -13,6 +13,7 @@ import { HttpModule } from './presentation/controller/http.module';
       validationSchema: Joi.object({
         ACCESS_TOKEN_SECRET: Joi.string().required(),
         REFRESH_TOKEN_SECRET: Joi.string().required(),
+        VERIFY_TOKEN_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.string().required(),
         DATABASE_URL: Joi.string().required(),
       }),

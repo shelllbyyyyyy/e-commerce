@@ -6,6 +6,7 @@ export class User {
     private readonly username: string,
     private readonly email: string,
     private readonly password: string,
+    private readonly isVerified: boolean,
     private readonly display_name?: string | undefined,
     private readonly profile_picture?: string | undefined,
     private readonly phone_number?: string | undefined,
@@ -19,6 +20,7 @@ export class User {
     this.username = username;
     this.email = email;
     this.password = password;
+    this.isVerified = isVerified;
     this.display_name = display_name;
     this.profile_picture = profile_picture;
     this.phone_number = phone_number;
@@ -43,6 +45,10 @@ export class User {
 
   getPassword(): string {
     return this.password;
+  }
+
+  IsVerified(): boolean {
+    return this.isVerified;
   }
 
   getDisplayName(): string | undefined {
@@ -91,6 +97,7 @@ export class User {
       this.username,
       this.email,
       this.password,
+      this.isVerified,
       display_name,
       profile_picture,
       phone_number,
