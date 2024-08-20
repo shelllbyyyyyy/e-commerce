@@ -12,6 +12,9 @@ import { RmqModule, USER_SERVICE } from '@libs/shared';
       isGlobal: true,
       validationSchema: Joi.object({
         DATABASE_URL: Joi.string().required(),
+        CLOUDINARY_NAME: Joi.string().required(),
+        CLOUDINARY_API_KEY: Joi.string().required(),
+        CLOUDINARY_API_SECRET: Joi.string().required(),
       }),
       envFilePath: './apps/user/.env',
     }),

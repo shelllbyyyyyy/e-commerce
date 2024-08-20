@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { RmqModule, USER_SERVICE } from '@libs/shared';
+import { ConvertBufferService, RmqModule, USER_SERVICE } from '@libs/shared';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { AddressController } from './address/address.controller';
@@ -13,6 +13,6 @@ import { AddressService } from './address/address.service';
     }),
   ],
   controllers: [UserController, AddressController],
-  providers: [UserService, AddressService],
+  providers: [UserService, AddressService, ConvertBufferService],
 })
 export class UserModule {}
