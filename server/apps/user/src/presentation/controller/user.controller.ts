@@ -16,6 +16,7 @@ import {
 
 import { User } from '@libs/domain';
 import {
+  ConvertBufferService,
   JwtAuthGuard,
   RmqService,
   RpcExceptionFilter,
@@ -36,6 +37,7 @@ export class UserController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     private readonly rmqService: RmqService,
+    private readonly bufferService: ConvertBufferService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -82,13 +84,16 @@ export class UserController {
   async handleUpdateUser(@Payload() data: any, @Ctx() context: RmqContext) {
     const rpc = RpcRequestHandler.execute<UpdateUserDTO>(data);
     const { display_name, phone_number, profile_picture } = rpc.request;
+
     const user = rpc.user;
+    const file = this.bufferService.encodeToMulter(rpc.imageFile);
 
     const command = new UpdateUserCommand(
       user.sub,
       display_name,
       phone_number,
       profile_picture,
+      file,
     );
 
     try {

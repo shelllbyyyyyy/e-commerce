@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, lastValueFrom, throwError } from 'rxjs';
 
-import { USER_SERVICE } from '@libs/shared';
+import { Payload, USER_SERVICE } from '@libs/shared';
 import { Address, User } from '@libs/domain';
 import { UpdateUserDTO } from './dtos/update-user.dto';
 import { UpdateAddressDTO } from './dtos/update-address.dto';
@@ -53,6 +53,7 @@ export class UserService {
 
   async updateUser(
     request: UpdateUserDTO,
+    imageFile: Payload,
     authentication: string,
   ): Promise<User> {
     try {
@@ -60,6 +61,7 @@ export class UserService {
         this.rmqClient
           .send('update_user', {
             request,
+            imageFile,
             access_token: authentication,
           })
           .pipe(

@@ -3,7 +3,6 @@ import { Module } from '@nestjs/common';
 import { RmqModule, USER_SERVICE } from '@libs/shared';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { AddressModule } from './address/address.module';
 import { AddressController } from './address/address.controller';
 import { AddressService } from './address/address.service';
 

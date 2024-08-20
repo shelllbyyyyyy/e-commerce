@@ -4,11 +4,15 @@ import {
   Delete,
   Get,
   HttpStatus,
+  MaxFileSizeValidator,
   NotFoundException,
   Param,
+  ParseFilePipe,
   Patch,
   Req,
   Res,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -24,11 +28,16 @@ import { Request, Response } from 'express';
 import { ApiResponse } from '../auth/dtos/api-response.dto';
 import { User } from '@libs/domain';
 import { UpdateUserDTO } from './dtos/update-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ConvertBufferService } from '@libs/shared';
 
 @Controller('user')
 @ApiTags('User')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly bufferService: ConvertBufferService,
+  ) {}
 
   @Get()
   @ApiOkResponse({
@@ -85,13 +94,24 @@ export class UserController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Something wrong',
   })
+  @UseInterceptors(FileInterceptor('avatar'))
   async handleUpdate(
     @Body() dto: UpdateUserDTO,
     @Req() req: Request,
     @Res() res: Response,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 })],
+        fileIsRequired: false,
+      }),
+    )
+    imageFile?: Express.Multer.File,
   ) {
+    const payload = this.bufferService.decodeFromMulter(imageFile);
+
     const update = await this.userService.updateUser(
       dto,
+      payload,
       req.cookies.access_token,
     );
 
