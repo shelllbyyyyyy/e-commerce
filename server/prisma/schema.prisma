@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id                String          @id @default(dbgenerated("gen_random_uuid()"))
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   username          String
   email             String          @unique @db.VarChar
   password          String
@@ -25,7 +25,7 @@ model User {
 }
 
 model Address {
-  id                String          @id @default(dbgenerated("gen_random_uuid()"))
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   first_name        String
   last_name         String
   phone_number      String
@@ -34,7 +34,7 @@ model Address {
   state             String
   postal_code       String
   country_code      String
-  mapUrl           String?
+  mapUrl            String?
   createdAt         DateTime        @default(now()) @db.Timestamptz(6)
   updatedAt         DateTime        @updatedAt @db.Timestamptz(6)
 
@@ -42,4 +42,76 @@ model Address {
   user          User     @relation(fields: [userId], references: [id])
 
   @@map("address")
+}
+
+enum InventoryStatus {
+  AVAILABLE
+  ON_ORDER
+  RESERVED
+}
+
+model Inventory {
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  quantity         Int
+  status           InventoryStatus
+
+  itemId           String          @db.Uuid
+  item             ProductVariant  @relation(fields: [itemId], references: [id])
+
+  @@map("inventory")
+}
+
+model Product {
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String
+  price                Int
+  imageUrl             String[]
+  slug                 String                 @unique
+  description          String    
+  createdAt            DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime               @updatedAt @db.Timestamptz(6)
+
+  category             CategoriesOnProducts[]
+  variant              ProductVariant[]
+
+  @@map("product")
+}
+
+model ProductVariant {
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sku       String
+  price     Int
+  imageUrl  String
+  label     String
+  createdAt DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime    @updatedAt @db.Timestamptz(6)
+
+  productId String      @db.Uuid
+  product   Product?     @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  inventory Inventory[]
+
+  @@map("variant")
+}
+
+model CategoriesOnProducts {
+  categoryId String   @db.Uuid
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  productId  String   @db.Uuid
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+  @@map("CategoriesOnProduct")
+}
+
+model Category {
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String                 @unique
+  createdAt            DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime               @updatedAt @db.Timestamptz(6)
+
+  product              CategoriesOnProducts[]
+
+  @@map("category")
 }
