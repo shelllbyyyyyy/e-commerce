@@ -23,6 +23,7 @@
       "@/auth/*": ["apps/auth/src/*"],
       "@/product/*": ["apps/product/src/*"],
       "@/billing/*": ["apps/billing/src/*"],
+      "@/inventory/*": ["apps/inventory/src/*"],
       "@/order/*": ["apps/order/src/*"],
       "@/root/*": ["apps/root/src/*"],
       "@/user/*": ["apps/user/src/*"],

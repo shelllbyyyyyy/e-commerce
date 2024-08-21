@@ -86,6 +86,23 @@
         "watchAssets": true
       }
     },
+    "inventory": {
+      "type": "application",
+      "root": "apps/inventory",
+      "entryFile": "main",
+      "sourceRoot": "apps/inventory/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/inventory/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "../../../libs/shared/src/mailer/templates/**/*.ejs",
+            "outDir": "dist/apps/root",
+            "watchAssets": true
+          }
+        ],
+        "watchAssets": true
+      }
+    },
     "shared": {
       "type": "library",
       "root": "libs/shared",

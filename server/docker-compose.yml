@@ -93,6 +93,25 @@ services:
     networks:
       - default
 
+  inventory:
+    build:
+      context: .
+      dockerfile: ./apps/inventory/Dockerfile
+      target: development
+    command: npm run start:dev inventory
+    env_file:
+      - ./apps/inventory/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - default
+
   gateways:
     build:
       context: .
@@ -107,6 +126,10 @@ services:
       auth:
         condition: service_started
       user:
+        condition: service_started
+      product:
+        condition: service_started
+      inventory:
         condition: service_started
       rabbitmq:
         condition: service_healthy
