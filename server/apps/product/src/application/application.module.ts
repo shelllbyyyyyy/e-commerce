@@ -3,11 +3,12 @@ import { CloudinaryModule } from 'nestjs-cloudinary';
 import { ConfigService } from '@nestjs/config';
 
 import { ProductService, ProductVariantService } from '@libs/domain';
-import { UploadService } from '@libs/shared';
+import { INVENTORY_SERVICE, RmqModule, UploadService } from '@libs/shared';
 
 import { PersistenceModule } from '../infrastructure/persistence/persistence.module';
 import { CommandHandlers } from './command';
 import { QueryHandlers } from './queries';
+import { InventoryService } from './service/inventory.service';
 
 @Module({
   imports: [
@@ -21,6 +22,9 @@ import { QueryHandlers } from './queries';
       }),
       inject: [ConfigService],
     }),
+    RmqModule.register({
+      name: INVENTORY_SERVICE,
+    }),
   ],
   providers: [
     ...QueryHandlers,
@@ -28,6 +32,7 @@ import { QueryHandlers } from './queries';
     ProductService,
     ProductVariantService,
     UploadService,
+    InventoryService,
   ],
   exports: [
     ...QueryHandlers,
@@ -35,6 +40,7 @@ import { QueryHandlers } from './queries';
     ProductService,
     ProductVariantService,
     UploadService,
+    InventoryService,
   ],
 })
 export class ApplicationModule {}

@@ -27,4 +27,8 @@ export class AddProductDTO {
 
   @IsString()
   readonly category: string;
+
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value))
+  readonly quantity: number;
 }

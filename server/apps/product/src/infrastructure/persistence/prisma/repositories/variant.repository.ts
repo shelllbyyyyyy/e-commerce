@@ -36,16 +36,9 @@ export class ProductVariantRepositoryImpl implements ProductVariantRepository {
             slug,
           },
         },
-        inventory: {
-          create: {
-            quantity: 1,
-            status: 'AVAILABLE',
-          },
-        },
       },
       include: {
         product: true,
-        inventory: true,
       },
     });
 
@@ -57,7 +50,6 @@ export class ProductVariantRepositoryImpl implements ProductVariantRepository {
       const variant = await prisma.productVariant.findUnique({
         where: { id },
         include: {
-          inventory: true,
           product: true,
         },
       });

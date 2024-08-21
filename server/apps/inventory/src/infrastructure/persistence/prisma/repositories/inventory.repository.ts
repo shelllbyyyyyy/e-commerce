@@ -10,6 +10,22 @@ import { InventoryMapper } from '../mapper/inventory.mapper';
 export class InventoryRepositoryImpl implements InventoryRepository {
   constructor(private readonly service: PrismaService) {}
 
+  async addToInventory(
+    productId: string,
+    quantity: number,
+  ): Promise<Inventory> {
+    const result = await this.service.inventory.create({
+      data: {
+        quantity: quantity,
+        status: quantity == 0 || quantity < 1 ? 'RESERVED' : 'AVAILABLE',
+        item: { connect: { id: productId } },
+      },
+      include: { item: true },
+    });
+
+    return InventoryMapper.toDomain(result);
+  }
+
   async getAllStockProduct(): Promise<Inventory[]> {
     const result = await this.service.inventory.findMany({
       include: { item: true },

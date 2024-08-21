@@ -14,4 +14,8 @@ export class AddProductVariantDTO {
 
   @IsString()
   readonly label: string;
+
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value))
+  readonly quantity: number;
 }

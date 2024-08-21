@@ -7,6 +7,13 @@ import { Inventory } from '../entities/inventory.entity';
 export class InventoryService {
   constructor(private readonly repository: InventoryRepository) {}
 
+  async addToInventory(
+    productId: string,
+    quantity: number,
+  ): Promise<Inventory> {
+    return await this.repository.addToInventory(productId, quantity);
+  }
+
   async getAllStockProduct(): Promise<Inventory[]> {
     return await this.repository.getAllStockProduct();
   }

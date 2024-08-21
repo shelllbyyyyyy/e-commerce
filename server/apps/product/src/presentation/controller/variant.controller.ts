@@ -28,6 +28,7 @@ import { DeleteProductVariantCommand } from '@/product/application/command/varia
 import { UpdateProductVariantDTO } from '@/root/product/dto/update-product-variant.dto';
 import { UpdateProductVariantCommand } from '@/product/application/command/variant/update-variant.command';
 import { GetProductVariantByIdQuery } from '@/product/application/queries/variant/get-product-variant-by-id.query';
+import { InventoryService } from '@/product/application/service/inventory.service';
 
 @Controller('variant')
 @UseFilters(new RpcExceptionFilter())
@@ -37,6 +38,7 @@ export class VariantController {
     private readonly query: QueryBus,
     private readonly rmqService: RmqService,
     private readonly bufferService: ConvertBufferService,
+    private readonly inventoryService: InventoryService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -46,7 +48,7 @@ export class VariantController {
     @Ctx() context: RmqContext,
   ) {
     const rpc = RpcRequestHandler.execute<AddProductVariantDTO>(data);
-    const { sku, imageUrl, label, price } = rpc.request;
+    const { sku, imageUrl, label, price, quantity } = rpc.request;
 
     const slug = rpc.param;
     const file = this.bufferService.encodeToMulter(rpc.imageFile);
@@ -68,6 +70,12 @@ export class VariantController {
 
       this.rmqService.ack(context);
 
+      await this.inventoryService.addToInventory(
+        result.getId(),
+        { quantity },
+        data.access_token,
+      );
+
       return result;
     } catch (error) {
       throw new RpcException(
@@ -82,7 +90,6 @@ export class VariantController {
     @Ctx() context: RmqContext,
   ) {
     const rpc = RpcRequestHandler.execute(data);
-    console.log(rpc);
 
     const query = new GetProductVariantByIdQuery(rpc.param);
 

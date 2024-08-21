@@ -37,12 +37,6 @@ export class ProductRepositoryImpl implements ProductRepository {
             imageUrl: data.getImageUrl()[0],
             price: data.getPrice(),
             label: data.getVariant()[0].getLabel(),
-            inventory: {
-              create: {
-                quantity: 1,
-                status: 'AVAILABLE',
-              },
-            },
           },
         },
         category: {

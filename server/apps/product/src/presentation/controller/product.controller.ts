@@ -33,6 +33,8 @@ import {
   RpcRequestHandler,
 } from '@libs/shared';
 
+import { InventoryService } from '@/product/application/service/inventory.service';
+
 @Controller('product')
 @UseFilters(new RpcExceptionFilter())
 export class ProductController {
@@ -41,6 +43,7 @@ export class ProductController {
     private readonly query: QueryBus,
     private readonly rmqService: RmqService,
     private readonly bufferService: ConvertBufferService,
+    private readonly inventoryService: InventoryService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -48,8 +51,17 @@ export class ProductController {
   async handleAddProduct(@Payload() data: any, @Ctx() context: RmqContext) {
     const rpc = RpcRequestHandler.execute<AddProductDTO>(data);
 
-    const { name, slug, sku, category, description, imageUrl, label, price } =
-      rpc.request;
+    const {
+      name,
+      slug,
+      sku,
+      category,
+      description,
+      imageUrl,
+      label,
+      price,
+      quantity,
+    } = rpc.request;
 
     const file = this.bufferService.encodeToMulter(rpc.imageFile);
 
@@ -71,6 +83,14 @@ export class ProductController {
       );
 
       this.rmqService.ack(context);
+
+      const variantId = result.getVariant()[0].getId();
+
+      await this.inventoryService.addToInventory(
+        variantId,
+        { quantity },
+        data.access_token,
+      );
 
       return result;
     } catch (error) {
