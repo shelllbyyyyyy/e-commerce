@@ -15,7 +15,6 @@ import {
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
-  BadGatewayException,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -28,11 +27,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { ConvertBufferService } from '@libs/shared';
+
 import { ProductService } from './product.service';
 import { AddProductDTO } from './dto/add-product.dto';
 import { ApiResponse } from '../auth/dtos/api-response.dto';
 import { UpdateProductDTO } from './dto/update-product-dto';
-import { ConvertBufferService } from '@libs/shared';
 import { AddProductVariantDTO } from './dto/add-product-variant.dto';
 import { UpdateProductVariantDTO } from './dto/update-product-variant.dto';
 

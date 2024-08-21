@@ -1,9 +1,9 @@
 import { ProductVariant } from './product-variant.entity';
 
 export enum InventoryStatus {
-  AVAILABLE,
-  ON_ORDER,
-  RESERVED,
+  AVAILABLE = 'Available',
+  ON_ORDER = 'On Order',
+  RESERVED = 'Reserved',
 }
 
 export class Inventory {
@@ -33,5 +33,15 @@ export class Inventory {
 
   getItem(): ProductVariant {
     return this.item;
+  }
+
+  updateStock({
+    quantity,
+    status,
+  }: {
+    quantity: number;
+    status: InventoryStatus;
+  }): Inventory {
+    return new Inventory(this.id, quantity, status, this.item);
   }
 }

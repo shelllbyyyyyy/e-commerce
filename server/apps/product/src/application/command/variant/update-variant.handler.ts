@@ -1,10 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { BadRequestException } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { Prisma } from '@prisma/client';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { UpdateProductVariantCommand } from './update-variant.command';
+
 import { ProductVariant, ProductVariantService } from '@libs/domain';
 import { PRODUCT_IMAGE, UploadService } from '@libs/shared';
+
+import { UpdateProductVariantCommand } from './update-variant.command';
 
 @CommandHandler(UpdateProductVariantCommand)
 export class UpdateProductVariantHandler

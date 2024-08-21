@@ -6,7 +6,7 @@ import { ProductVariant, ProductVariantService } from '@libs/domain';
 import { GetProductVariantByIdQuery } from './get-product-variant-by-id.query';
 
 @QueryHandler(GetProductVariantByIdQuery)
-export class GetProductByIdHandler
+export class GetProductVariantByIdHandler
   implements IQueryHandler<GetProductVariantByIdQuery, ProductVariant>
 {
   constructor(private readonly service: ProductVariantService) {}

@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
+import { CloudinaryModule } from 'nestjs-cloudinary';
+import { ConfigService } from '@nestjs/config';
 
 import { ProductService, ProductVariantService } from '@libs/domain';
+import { UploadService } from '@libs/shared';
 
 import { PersistenceModule } from '../infrastructure/persistence/persistence.module';
 import { CommandHandlers } from './command';
 import { QueryHandlers } from './queries';
-import { UploadService } from '@libs/shared';
-import { ConfigService } from '@nestjs/config';
-import { CloudinaryModule } from 'nestjs-cloudinary';
 
 @Module({
   imports: [

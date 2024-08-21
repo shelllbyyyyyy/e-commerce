@@ -1,8 +1,10 @@
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+
 import { ProductVariant, ProductVariantRepository } from '@libs/domain';
 import { PrismaService } from '@libs/shared';
-import { Injectable } from '@nestjs/common';
+
 import { VariantMapper } from '../mapper/varian.mapper';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductVariantRepositoryImpl implements ProductVariantRepository {

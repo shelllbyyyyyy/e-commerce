@@ -1,5 +1,6 @@
-import { ProductVariant } from '@libs/domain';
 import { ProductVariant as Variant } from '@prisma/client';
+
+import { ProductVariant } from '@libs/domain';
 
 export class VariantMapper {
   static toPrisma(data: ProductVariant): any {

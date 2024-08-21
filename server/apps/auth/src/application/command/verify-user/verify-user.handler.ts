@@ -25,8 +25,6 @@ export class VerifyUserHandler
         secret: this.configService.get<string>('VERIFY_TOKEN_SECRET'),
       });
 
-      console.log(decode);
-
       await this.userService.verifyUser(decode.sub);
 
       return true;

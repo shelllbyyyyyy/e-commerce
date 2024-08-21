@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, lastValueFrom, throwError } from 'rxjs';
 
 import { Payload, PRODUCT_SERVICE } from '@libs/shared';
 import { Product, ProductVariant } from '@libs/domain';
 
 import { AddProductDTO } from './dto/add-product.dto';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { UpdateProductDTO } from './dto/update-product-dto';
 import { AddProductVariantDTO } from './dto/add-product-variant.dto';
 import { UpdateProductVariantDTO } from './dto/update-product-variant.dto';

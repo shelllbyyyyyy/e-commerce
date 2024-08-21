@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { RpcException } from '@nestjs/microservices';
+import { Prisma } from '@prisma/client';
 
 import { Product, ProductService } from '@libs/domain';
 

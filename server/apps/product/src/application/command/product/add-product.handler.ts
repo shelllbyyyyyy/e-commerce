@@ -1,13 +1,13 @@
+import { randomUUID } from 'crypto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RpcException } from '@nestjs/microservices';
 import { BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 import { Product, ProductService, ProductVariant } from '@libs/domain';
+import { PRODUCT_IMAGE, UploadService } from '@libs/shared';
 
 import { AddProductCommand } from './add-product.command';
-import { randomUUID } from 'crypto';
-import { PRODUCT_IMAGE, UploadService } from '@libs/shared';
 
 @CommandHandler(AddProductCommand)
 export class AddProductHandler

@@ -82,6 +82,7 @@ export class VariantController {
     @Ctx() context: RmqContext,
   ) {
     const rpc = RpcRequestHandler.execute(data);
+    console.log(rpc);
 
     const query = new GetProductVariantByIdQuery(rpc.param);
 

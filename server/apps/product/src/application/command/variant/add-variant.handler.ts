@@ -1,8 +1,8 @@
+import { randomUUID } from 'crypto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RpcException } from '@nestjs/microservices';
 import { BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { randomUUID } from 'crypto';
 
 import { ProductVariant, ProductVariantService } from '@libs/domain';
 import { PRODUCT_IMAGE, UploadService } from '@libs/shared';
