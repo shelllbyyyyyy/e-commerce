@@ -24,13 +24,16 @@ export class DeleteProductHandler
       const product = await this.service.findBySlug(slug);
 
       const file = product.getImageUrl();
-      file.map(async (i) => {
-        await this.uploadService.deleteImage(i);
-      });
 
       const result = await this.service.delete(slug);
 
-      if (result) return true;
+      if (result) {
+        file.map(async (i) => {
+          await this.uploadService.deleteImage(i);
+        });
+
+        return true;
+      }
 
       return true;
     } catch (error) {

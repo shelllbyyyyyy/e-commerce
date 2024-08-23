@@ -22,7 +22,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new GatewayRpcExceptionFilter(httpAdapterHost));
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(new ValidationPipe());
 
   app.setGlobalPrefix('api');
   app.enableCors({

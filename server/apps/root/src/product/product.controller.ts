@@ -15,6 +15,8 @@ import {
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -281,10 +283,20 @@ export class ProductController {
     @Body() dto: UpdateProductVariantDTO,
     @Req() req: Request,
     @Res() res: Response,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 })],
+        fileIsRequired: false,
+      }),
+    )
+    imageFile?: Express.Multer.File,
   ) {
+    const payload = this.bufferService.decodeFromMulter(imageFile);
+
     const result = await this.productService.updateProductVariantById(
       id,
       dto,
+      payload,
       req.cookies.access_token,
     );
 

@@ -1,10 +1,9 @@
-import { randomUUID } from 'crypto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RpcException } from '@nestjs/microservices';
 import { BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
-import { Product, ProductService, ProductVariant } from '@libs/domain';
+import { Product, ProductService } from '@libs/domain';
 import { PRODUCT_IMAGE, UploadService } from '@libs/shared';
 
 import { AddProductCommand } from './add-product.command';
@@ -31,35 +30,24 @@ export class AddProductHandler
       imageFile,
     } = command;
 
-    const id = randomUUID();
-
     try {
       const uploadImage = await this.uploadService.uploadImageToCloudinary(
         imageFile,
         PRODUCT_IMAGE,
       );
 
-      const variant = new ProductVariant(
-        id,
-        sku,
-        price,
-        uploadImage.url,
-        label,
-        id,
-      );
-
-      const product = new Product(
-        id,
+      const result = await this.service.save({
         name,
         price,
-        [uploadImage.url],
+        imageUrl: uploadImage.secure_url,
         slug,
         description,
         category,
-        [variant],
-      );
+        sku,
+        label,
+      });
 
-      return await this.service.save(product);
+      return result;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new RpcException(new BadRequestException(error.message));

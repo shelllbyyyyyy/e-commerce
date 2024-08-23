@@ -61,7 +61,7 @@ export class InventoryService {
     try {
       const result = await lastValueFrom(
         this.rmqService
-          .send('get_stock_product', {
+          .send('update_stock_product', {
             param,
             request,
             access_token: authentication,

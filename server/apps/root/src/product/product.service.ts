@@ -186,6 +186,7 @@ export class ProductService {
   async updateProductVariantById(
     param: string,
     request: UpdateProductVariantDTO,
+    imageFile: Payload,
     authentication: string,
   ): Promise<ProductVariant> {
     try {
@@ -194,6 +195,7 @@ export class ProductService {
           .send('update_product_variant_by_id', {
             param,
             request,
+            imageFile,
             access_token: authentication,
           })
           .pipe(

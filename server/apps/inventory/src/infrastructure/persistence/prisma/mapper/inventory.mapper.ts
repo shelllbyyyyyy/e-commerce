@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client';
 
-import { Inventory, InventoryStatus } from '@libs/domain';
-
+import { Inventory, InventoryStatus, Quantity } from '@libs/domain';
 import { VariantMapper } from '@/product/infrastructure/persistence/prisma/mapper/varian.mapper';
 
 const inventory = Prisma.validator<Prisma.InventoryDefaultArgs>()({
@@ -16,16 +15,17 @@ export class InventoryMapper {
   static toPrisma(data: Inventory): any {
     return {
       status: data.getStatus(),
-      quantity: data.getQuantity(),
+      quantity: data.getQuantity().getValue(),
     };
   }
 
   static toDomain(data: Inventories): Inventory {
+    const variant = VariantMapper.toDomain(data.item);
     return new Inventory(
       data.id,
-      data.quantity,
-      data.status as InventoryStatus,
-      VariantMapper.toDomain(data.item),
+      new Quantity(data.quantity),
+      data.status as unknown as InventoryStatus,
+      variant,
     );
   }
 }

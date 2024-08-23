@@ -1,15 +1,18 @@
-import { CategoriesOnProduct } from './categories-on-product.entity';
+import { Category } from '../values-object/category';
+import { Description } from '../values-object/description';
+import { Price } from '../values-object/price';
+import { Slug } from '../values-object/slug';
 import { ProductVariant } from './product-variant.entity';
 
 export class Product {
   constructor(
     private readonly id: string,
     private readonly name: string,
-    private readonly price: number,
+    private readonly price: Price,
     private readonly imageUrl: string[] = [],
-    private readonly slug: string,
-    private readonly description: string,
-    private readonly category: string,
+    private readonly slug: Slug,
+    private readonly description: Description,
+    private readonly category: Category,
     private readonly variant: ProductVariant[] = [],
     private readonly createdAt?: Date,
     private readonly updatedAt?: Date,
@@ -34,7 +37,7 @@ export class Product {
     return this.name;
   }
 
-  getPrice(): number {
+  getPrice(): Price {
     return this.price;
   }
 
@@ -42,15 +45,15 @@ export class Product {
     return this.imageUrl;
   }
 
-  getSlug(): string {
+  getSlug(): Slug {
     return this.slug;
   }
 
-  getDescription(): string {
+  getDescription(): Description {
     return this.description;
   }
 
-  getCategory(): string {
+  getCategory(): Category {
     return this.category;
   }
 
@@ -66,22 +69,64 @@ export class Product {
     return this.updatedAt;
   }
 
+  static create({
+    id,
+    name,
+    price,
+    imageUrl,
+    slug,
+    description,
+    category,
+    sku,
+    label,
+  }: {
+    id: string;
+    name: string;
+    price: number;
+    imageUrl: string[];
+    slug: string;
+    description: string;
+    category: string;
+    sku: string;
+    label: string;
+  }): Product {
+    return new Product(
+      id,
+      name,
+      new Price(price),
+      imageUrl,
+      new Slug(slug),
+      new Description(description),
+      new Category(category),
+      [
+        ProductVariant.create({
+          id,
+          sku,
+          price,
+          imageUrl: imageUrl[0],
+          label,
+          productId: id,
+        }),
+      ],
+    );
+  }
+
   updateProduct({
     name,
     description,
     price,
   }: {
-    name: string;
-    description: string;
-    price: number;
+    name?: string;
+    description?: string;
+    price?: number;
   }): Product {
     return new Product(
       this.id,
       name || this.name,
-      price || this.price,
+      price ? new Price(price) : this.price,
       this.imageUrl,
       this.slug,
-      description || this.description,
+      description ? new Description(description) : this.description,
       this.category,
       this.variant,
     );

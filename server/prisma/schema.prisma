@@ -56,7 +56,7 @@ model Inventory {
   status           InventoryStatus
 
   itemId           String          @db.Uuid
-  item             ProductVariant  @relation(fields: [itemId], references: [id])
+  item             ProductVariant  @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@map("inventory")
 }

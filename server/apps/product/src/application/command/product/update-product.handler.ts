@@ -17,11 +17,7 @@ export class UpdateProductHandler
     const { name, description, price, slug } = command;
 
     try {
-      const product = await this.service.findBySlug(slug);
-
-      const update = product.updateProduct({ name, description, price });
-
-      return await this.service.update(update);
+      return await this.service.update({ name, description, price, slug });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new RpcException(new BadRequestException(error.message));

@@ -1,10 +1,14 @@
+import { Label } from '../values-object/label';
+import { Price } from '../values-object/price';
+import { Sku } from '../values-object/sku';
+
 export class ProductVariant {
   constructor(
     private readonly id: string,
-    private readonly sku: string,
-    private readonly price: number,
+    private readonly sku: Sku,
+    private readonly price: Price,
     private readonly imageUrl: string,
-    private readonly label: string,
+    private readonly label: Label,
     private readonly productId: string,
     private readonly createdAt?: Date,
     private readonly updatedAt?: Date,
@@ -21,11 +25,11 @@ export class ProductVariant {
     return this.id;
   }
 
-  getSku(): string {
+  getSku(): Sku {
     return this.sku;
   }
 
-  getPrice(): number {
+  getPrice(): Price {
     return this.price;
   }
 
@@ -33,11 +37,11 @@ export class ProductVariant {
     return this.imageUrl;
   }
 
-  getLabel(): string {
+  getLabel(): Label {
     return this.label;
   }
 
-  getproduct(): string {
+  getProductId(): string {
     return this.productId;
   }
 
@@ -49,23 +53,48 @@ export class ProductVariant {
     return this.updatedAt;
   }
 
+  static create({
+    id,
+    sku,
+    price,
+    imageUrl,
+    label,
+    productId,
+  }: {
+    id: string;
+    sku: string;
+    price: number;
+    imageUrl: string;
+    label: string;
+    productId: string;
+  }): ProductVariant {
+    return new ProductVariant(
+      id,
+      new Sku(sku),
+      new Price(price),
+      imageUrl,
+      new Label(label),
+      productId,
+    );
+  }
+
   updateVariant({
     price,
     sku,
     imageUrl,
     label,
   }: {
-    price: number;
-    sku: string;
-    imageUrl: string;
-    label: string;
+    price?: number;
+    sku?: string;
+    imageUrl?: string;
+    label?: string;
   }): ProductVariant {
     return new ProductVariant(
       this.id,
-      sku,
-      price,
-      imageUrl,
-      label,
+      sku ? new Sku(sku) : this.sku,
+      price ? new Price(price) : this.price,
+      imageUrl ? imageUrl : undefined,
+      label ? new Label(label) : this.label,
       this.productId,
     );
   }

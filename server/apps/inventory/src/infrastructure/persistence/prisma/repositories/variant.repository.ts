@@ -25,37 +25,24 @@ export class ProductVariantRepositoryImpl implements ProductVariantRepository {
 
     const { sku, imageUrl, label, price } = payload;
 
-    const product = await this.service.$transaction(async (tx) => {
-      const result = await tx.productVariant.create({
-        data: {
-          sku,
-          imageUrl,
-          label,
-          price,
-          product: {
-            connect: {
-              id: data.getProductId(),
-            },
+    const result = await this.service.productVariant.create({
+      data: {
+        sku,
+        imageUrl,
+        label,
+        price,
+        product: {
+          connect: {
+            id: data.getProductId(),
           },
         },
-        include: {
-          product: true,
-        },
-      });
-
-      if (result) {
-        await tx.product.update({
-          where: { id: result.productId },
-          data: {
-            imageUrl: { push: imageUrl },
-          },
-        });
-      }
-
-      return VariantMapper.toDomain(result);
+      },
+      include: {
+        product: true,
+      },
     });
 
-    return product;
+    return VariantMapper.toDomain(result);
   }
 
   async delete(id: string): Promise<boolean> {

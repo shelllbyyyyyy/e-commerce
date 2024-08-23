@@ -1,22 +1,21 @@
-import { Optional } from '@nestjs/common';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsNumberString, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateProductVariantDTO {
   @IsNumber()
-  @Transform(({ value }) => parseInt(value))
-  @Optional()
+  @Transform(({ value }: { value: string }) => parseInt(value))
+  @IsOptional()
   readonly price: number;
 
   @IsString()
-  @Optional()
+  @IsOptional()
   readonly imageUrl: string;
 
   @IsString()
-  @Optional()
+  @IsOptional()
   readonly sku: string;
 
   @IsString()
-  @Optional()
+  @IsOptional()
   readonly label: string;
 }

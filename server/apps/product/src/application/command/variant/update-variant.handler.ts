@@ -33,12 +33,12 @@ export class UpdateProductVariantHandler
           imageFile,
           PRODUCT_IMAGE,
         );
-        imageUrl = uploadImage.url;
+        imageUrl = uploadImage.secure_url;
+      } else {
+        imageUrl = undefined;
       }
 
-      const update = product.updateVariant({ label, sku, imageUrl, price });
-
-      return await this.service.update(update);
+      return await this.service.update({ id, imageUrl, label, price, sku });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new RpcException(new BadRequestException(error.message));

@@ -1,6 +1,8 @@
-import { Product, ProductVariant } from '@libs/domain';
-
 import { Prisma } from '@prisma/client';
+
+import { Category, Description, Price, Product, Slug } from '@libs/domain';
+
+import { VariantMapper } from './varian.mapper';
 
 const product = Prisma.validator<Prisma.ProductDefaultArgs>()({
   include: {
@@ -15,32 +17,26 @@ export class ProductMapper {
   static toPrisma(data: Product): any {
     return {
       name: data.getName(),
-      price: data.getPrice(),
-      description: data.getDescription(),
-      slug: data.getSlug(),
+      price: data.getPrice().getValue(),
+      description: data.getDescription().getValue(),
+      slug: data.getSlug().getValue(),
       imageUrl: data.getImageUrl(),
     };
   }
 
   static toDomain(data: Products): Product {
     const variant = data.variant.map((item) => {
-      return new ProductVariant(
-        item.id,
-        item.sku,
-        item.price,
-        item.imageUrl,
-        item.label,
-        item.productId,
-      );
+      return VariantMapper.toDomain(item);
     });
+
     return new Product(
       data.id,
       data.name,
-      data.price,
+      new Price(data.price),
       data.imageUrl,
-      data.slug,
-      data.description,
-      data.category[0].category.name,
+      new Slug(data.slug),
+      new Description(data.description),
+      new Category(data.category[0].category.name),
       variant,
     );
   }

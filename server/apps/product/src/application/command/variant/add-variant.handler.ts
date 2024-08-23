@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RpcException } from '@nestjs/microservices';
 import { BadRequestException } from '@nestjs/common';
@@ -19,9 +18,7 @@ export class AddProductVariantHandler
   ) {}
 
   async execute(command: AddProductVariantCommand): Promise<ProductVariant> {
-    const { slug, imageUrl, label, price, sku, imageFile } = command;
-
-    const id = randomUUID();
+    const { slug, label, price, sku, imageFile } = command;
 
     try {
       const uploadImage = await this.uploadService.uploadImageToCloudinary(
@@ -29,16 +26,13 @@ export class AddProductVariantHandler
         PRODUCT_IMAGE,
       );
 
-      const variant = new ProductVariant(
-        id,
+      return await this.service.save({
         sku,
         price,
-        uploadImage.url,
+        imageUrl: uploadImage.secure_url,
+        slug,
         label,
-        id,
-      );
-
-      return await this.service.save(slug, variant);
+      });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new RpcException(new BadRequestException(error.message));

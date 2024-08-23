@@ -28,6 +28,7 @@ import { Product } from '@libs/domain';
 import {
   ConvertBufferService,
   JwtAuthGuard,
+  ProductMapper,
   RmqService,
   RpcExceptionFilter,
   RpcRequestHandler,
@@ -92,7 +93,9 @@ export class ProductController {
         data.access_token,
       );
 
-      return result;
+      const response = ProductMapper.toJson(result);
+
+      return response;
     } catch (error) {
       throw new RpcException(new BadRequestException('Add product failed'));
     }
@@ -107,7 +110,9 @@ export class ProductController {
       );
       this.rmqService.ack(context);
 
-      return result;
+      const response = result.map((value) => ProductMapper.toJson(value));
+
+      return response;
     } catch (error) {
       throw new RpcException(new NotFoundException('Product not found'));
     }
@@ -128,7 +133,9 @@ export class ProductController {
       );
       this.rmqService.ack(context);
 
-      return result;
+      const response = ProductMapper.toJson(result);
+
+      return response;
     } catch (error) {
       throw new RpcException(new NotFoundException('Product not found'));
     }
@@ -146,7 +153,9 @@ export class ProductController {
       );
       this.rmqService.ack(context);
 
-      return result;
+      const response = ProductMapper.toJson(result);
+
+      return response;
     } catch (error) {
       throw new RpcException(new NotFoundException('Product not found'));
     }
@@ -174,7 +183,9 @@ export class ProductController {
 
       this.rmqService.ack(context);
 
-      return result;
+      const response = ProductMapper.toJson(result);
+
+      return response;
     } catch (error) {
       throw new RpcException(new BadRequestException('Update product failed'));
     }

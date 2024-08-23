@@ -9,13 +9,19 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { InventoryService } from './inventory.service';
 import { ApiResponse } from '../auth/dtos/api-response.dto';
 import { UpdateInventoryDTO } from './dtos/update-inventory.dto';
 
 @Controller('inventory')
+@ApiTags('Inventory')
 export class InventoryController {
   constructor(private readonly service: InventoryService) {}
 

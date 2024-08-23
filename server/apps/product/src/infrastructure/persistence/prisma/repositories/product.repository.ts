@@ -33,18 +33,18 @@ export class ProductRepositoryImpl implements ProductRepository {
         ...payload,
         variant: {
           create: {
-            sku: data.getVariant()[0].getSku(),
+            sku: data.getVariant()[0].getSku().getValue(),
             imageUrl: data.getImageUrl()[0],
-            price: data.getPrice(),
-            label: data.getVariant()[0].getLabel(),
+            price: data.getPrice().getValue(),
+            label: data.getVariant()[0].getLabel().getValue(),
           },
         },
         category: {
           create: {
             category: {
               connectOrCreate: {
-                create: { name: data.getCategory() },
-                where: { name: data.getCategory() },
+                create: { name: data.getCategory().getValue() },
+                where: { name: data.getCategory().getValue() },
               },
             },
           },
@@ -83,7 +83,7 @@ export class ProductRepositoryImpl implements ProductRepository {
 
   async update(data: Product): Promise<Product> {
     const result = await this.service.product.update({
-      where: { slug: data.getSlug() },
+      where: { slug: data.getSlug().getValue() },
       data: {
         ...data,
       },

@@ -17,11 +17,11 @@ export class UpdateStockHandler
     const { productId, quantity, status } = command;
 
     try {
-      const inventory = await this.service.getStockProduct(productId);
-
-      const update = inventory.updateStock({ quantity, status });
-
-      return await this.service.updateStockProduct(update);
+      return await this.service.updateStockProduct({
+        productId,
+        quantity,
+        status,
+      });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new RpcException(new BadRequestException(error.message));

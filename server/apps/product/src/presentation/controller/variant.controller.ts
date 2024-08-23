@@ -21,6 +21,7 @@ import {
   RmqService,
   RpcExceptionFilter,
   RpcRequestHandler,
+  VariantMapper,
 } from '@libs/shared';
 import { AddProductVariantDTO } from '@/root/product/dto/add-product-variant.dto';
 import { AddProductVariantCommand } from '@/product/application/command/variant/add-variant.command';
@@ -76,7 +77,9 @@ export class VariantController {
         data.access_token,
       );
 
-      return result;
+      const response = VariantMapper.toJson(result);
+
+      return response;
     } catch (error) {
       throw new RpcException(
         new BadRequestException('Add productVariant failed'),
@@ -100,14 +103,16 @@ export class VariantController {
       >(query);
       this.rmqService.ack(context);
 
-      return result;
+      const response = VariantMapper.toJson(result);
+
+      return response;
     } catch (error) {
       throw new RpcException(new NotFoundException('Product not found'));
     }
   }
 
   @UseGuards(JwtAuthGuard)
-  @MessagePattern('update_product_variant')
+  @MessagePattern('update_product_variant_by_id')
   async handleUpdateProductVariant(
     @Payload() data: any,
     @Ctx() context: RmqContext,
@@ -136,7 +141,9 @@ export class VariantController {
 
       this.rmqService.ack(context);
 
-      return result;
+      const response = VariantMapper.toJson(result);
+
+      return response;
     } catch (error) {
       throw new RpcException(
         new BadRequestException('Update productVariant failed'),
