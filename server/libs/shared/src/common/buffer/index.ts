@@ -11,8 +11,11 @@ export type Payload = {
 
 @Injectable()
 export class ConvertBufferService {
-  decodeFromMulter(file: Express.Multer.File): Payload {
+  decodeFromMulter(file?: Express.Multer.File): Payload {
+    if (!file) return;
+
     const { originalname, buffer, mimetype, size, encoding, fieldname } = file;
+
     const payload = {
       originalname: originalname,
       fieldname: fieldname,
@@ -24,7 +27,8 @@ export class ConvertBufferService {
     return payload;
   }
 
-  encodeToMulter(data: Payload): Express.Multer.File {
+  encodeToMulter(data?: Payload): Express.Multer.File {
+    if (!data) return;
     const { originalname, buffer, mimetype, size, encoding, fieldname } = data;
 
     const fileBuffer = Buffer.from(buffer, 'base64');
