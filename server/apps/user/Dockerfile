@@ -5,9 +5,9 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable
 
-RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
-
 WORKDIR /usr/src/app
+
+RUN apk add --no-cache python3 make g++
 
 COPY pnpm-lock.yaml ./
 RUN pnpm fetch
@@ -23,6 +23,11 @@ RUN pnpm run build user
 
 FROM node:alpine AS production
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN corepack enable
+
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
@@ -32,13 +37,14 @@ COPY pnpm-lock.yaml ./
 RUN pnpm fetch
 
 COPY package*.json ./
-
-RUN pnpm install --only=production
+RUN pnpm install --prod --frozen-lockfile
 
 RUN pnpm prune --prod
 
 COPY . .
 
 COPY --from=development /usr/src/app/dist ./dist
+
+RUN pnpm prisma generate
 
 CMD ["node", "dist/apps/user/main"]

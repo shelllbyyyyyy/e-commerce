@@ -23,6 +23,11 @@ RUN pnpm run build cart
 
 FROM node:alpine AS production
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN corepack enable
+
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
@@ -39,5 +44,7 @@ RUN pnpm prune --prod
 COPY . .
 
 COPY --from=development /usr/src/app/dist ./dist
+
+RUN pnpm prisma generate
 
 CMD ["node", "dist/apps/cart/main"]

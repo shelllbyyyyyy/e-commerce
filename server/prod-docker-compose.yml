@@ -40,8 +40,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/auth/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev auth"
+      target: production
+    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:auth"
     env_file:
       - ./apps/auth/.env
     depends_on:
@@ -59,8 +59,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/user/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev user"
+      target: production
+    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:user"
     env_file:
       - ./apps/user/.env
     depends_on:
@@ -78,8 +78,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/product/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev product"
+      target: production
+    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:product"
     env_file:
       - ./apps/product/.env
     depends_on:
@@ -97,8 +97,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/inventory/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev inventory"
+      target: production
+    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:inventory"
     env_file:
       - ./apps/inventory/.env
     depends_on:
@@ -116,8 +116,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/cart/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev cart"
+      target: production
+    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:cart"
     env_file:
       - ./apps/cart/.env
     depends_on:
@@ -135,8 +135,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/root/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev root"
+      target: production
+    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:root"
     ports:
       - '5000:5000'
     env_file:
