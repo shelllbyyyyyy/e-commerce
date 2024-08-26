@@ -1,3 +1,8 @@
+export * from './cart/entities/cart-item.entity';
+export * from './cart/entities/cart.entity';
+export * from './cart/repositories/cart.repository';
+export * from './cart/services/cart.service';
+
 export * from './user/entities/user.entity';
 export * from './user/entities/address.entity';
 export * from './user/repositories/user-repository';

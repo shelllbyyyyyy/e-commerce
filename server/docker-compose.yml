@@ -41,7 +41,7 @@ services:
       context: .
       dockerfile: ./apps/auth/Dockerfile
       target: development
-    command: npm run start:dev auth
+    command: sh -c "npx prisma migrate deploy && npm run start:dev auth"
     env_file:
       - ./apps/auth/.env
     depends_on:
@@ -60,7 +60,7 @@ services:
       context: .
       dockerfile: ./apps/user/Dockerfile
       target: development
-    command: npm run start:dev user
+    command: sh -c "npx prisma migrate deploy && npm run start:dev user"
     env_file:
       - ./apps/user/.env
     depends_on:
@@ -79,7 +79,7 @@ services:
       context: .
       dockerfile: ./apps/product/Dockerfile
       target: development
-    command: npm run start:dev product
+    command: sh -c "npx prisma migrate deploy && npm run start:dev product"
     env_file:
       - ./apps/product/.env
     depends_on:
@@ -98,9 +98,28 @@ services:
       context: .
       dockerfile: ./apps/inventory/Dockerfile
       target: development
-    command: npm run start:dev inventory
+    command: sh -c "npx prisma migrate deploy && npm run start:dev inventory"
     env_file:
       - ./apps/inventory/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - default
+
+  cart:
+    build:
+      context: .
+      dockerfile: ./apps/cart/Dockerfile
+      target: development
+    command: sh -c "npx prisma migrate deploy && npm run start:dev cart"
+    env_file:
+      - ./apps/cart/.env
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -117,12 +136,16 @@ services:
       context: .
       dockerfile: ./apps/root/Dockerfile
       target: development
-    command: npm run start:dev root
+    command: sh -c "npx prisma migrate deploy && npm run start:dev root"
     ports:
       - '4000:4000'
     env_file:
       - ./apps/root/.env
     depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
       auth:
         condition: service_started
       user:
@@ -131,10 +154,8 @@ services:
         condition: service_started
       inventory:
         condition: service_started
-      rabbitmq:
-        condition: service_healthy
-      postgres-primary:
-        condition: service_healthy
+      cart:
+        condition: service_started
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules

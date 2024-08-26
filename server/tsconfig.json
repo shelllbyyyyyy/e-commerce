@@ -27,6 +27,7 @@
       "@/order/*": ["apps/order/src/*"],
       "@/root/*": ["apps/root/src/*"],
       "@/user/*": ["apps/user/src/*"],
+      "@/cart/*": ["apps/cart/src/*"],
       "@libs/domain": ["libs/domain/src"],
       "@libs/domain/*": ["libs/domain/src/*"]
     }

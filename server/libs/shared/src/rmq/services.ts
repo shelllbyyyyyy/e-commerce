@@ -4,3 +4,4 @@ export const PRODUCT_SERVICE = 'PRODUCT';
 export const ORDER_SERVICE = 'ORDER';
 export const BILLING_SERVICE = 'BILLING';
 export const INVENTORY_SERVICE = 'INVENTORY';
+export const CART_SERVICE = 'CART';

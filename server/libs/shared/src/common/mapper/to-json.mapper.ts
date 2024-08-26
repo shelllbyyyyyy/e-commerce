@@ -1,5 +1,17 @@
-import { Inventory, Product, ProductVariant } from '@libs/domain';
-import { InventoryResponse, ProductResponse, VariantResponse } from '../types';
+import {
+  Cart,
+  CartItem,
+  Inventory,
+  Product,
+  ProductVariant,
+} from '@libs/domain';
+import {
+  CartItemResponse,
+  CartResponse,
+  InventoryResponse,
+  ProductResponse,
+  VariantResponse,
+} from '../types';
 
 export class ProductMapper {
   static toJson(data: Product): ProductResponse {
@@ -41,6 +53,31 @@ export class InventoryMapper {
       quantity: data.getQuantity().getValue(),
       status: data.getStatus(),
       item: variant,
+    };
+  }
+}
+
+export class CartMapper {
+  static toJson(data: Cart): CartResponse {
+    const items = data
+      .getCartItem()
+      .map((value) => CartItemMapper.toJson(value));
+    return {
+      id: data.getId(),
+      userId: data.getUserId(),
+      items: items,
+    };
+  }
+}
+
+export class CartItemMapper {
+  static toJson(data: CartItem): CartItemResponse {
+    const item = VariantMapper.toJson(data.getItem());
+
+    return {
+      id: data.getId(),
+      item: item,
+      quantity: data.getQuantity().getValue(),
     };
   }
 }

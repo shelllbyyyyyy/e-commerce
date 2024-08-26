@@ -26,3 +26,15 @@ export type InventoryResponse = {
   status: InventoryStatus;
   item: VariantResponse;
 };
+
+export type CartResponse = {
+  id: string;
+  userId: string;
+  items: CartItemResponse[];
+};
+
+export type CartItemResponse = {
+  id: string;
+  item: VariantResponse;
+  quantity: number;
+};

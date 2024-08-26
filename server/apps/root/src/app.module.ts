@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
 import { ProductModule } from './product/product.module';
 import { InventoryModule } from './inventory/inventory.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { InventoryModule } from './inventory/inventory.module';
     SwaggerModule,
     ProductModule,
     InventoryModule,
+    CartModule,
   ],
   controllers: [AppController],
 })

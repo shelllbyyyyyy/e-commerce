@@ -1,47 +1,30 @@
-import { ProductVariant } from '@libs/domain/product/entities/product-variant.entity';
-import { User } from '@libs/domain/user/entities/user.entity';
+import { CartItem } from './cart-item.entity';
 
 export class Cart {
   constructor(
     private readonly id: string,
-    private readonly quantity: number,
-    private readonly item: ProductVariant,
-    private readonly user: User,
-    private readonly order?: string,
+    private readonly userId: string,
+    private cartItem: CartItem[] = [],
     private readonly createdAt?: Date,
     private readonly updatedAt?: Date,
-    private readonly checkoutAt?: Date,
-    private readonly deletedAt?: Date,
   ) {
     this.id = id;
-    this.quantity = quantity;
-    this.item = item;
-    this.user = user;
-    this.order = order;
+    this.userId = userId;
+    this.cartItem = cartItem;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    this.checkoutAt = checkoutAt;
-    this.deletedAt = deletedAt;
   }
 
   getId(): string {
     return this.id;
   }
 
-  getQuantity(): number {
-    return this.quantity;
+  getUserId(): string {
+    return this.userId;
   }
 
-  getItem(): ProductVariant {
-    return this.item;
-  }
-
-  getUser(): User {
-    return this.user;
-  }
-
-  getOrder(): string {
-    return this.order;
+  getCartItem(): CartItem[] {
+    return this.cartItem;
   }
 
   getCreatedAt(): Date {
@@ -52,11 +35,11 @@ export class Cart {
     return this.updatedAt;
   }
 
-  getCheckoutAt(): Date {
-    return this.checkoutAt;
+  static createCart({ id, userId }: { id: string; userId: string }): Cart {
+    return new Cart(id, userId, []);
   }
 
-  getDeletedAT(): Date {
-    return this.deletedAt;
+  addToCart(item: CartItem): Cart {
+    return new Cart(this.id, this.userId, [...this.cartItem, item]);
   }
 }

@@ -20,6 +20,7 @@ model User {
   updatedAt         DateTime?       @updatedAt @db.Timestamptz(6)
 
   address           Address[]
+  cart              Cart?
 
   @@map("user")
 }
@@ -78,28 +79,29 @@ model Product {
 }
 
 model ProductVariant {
-  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  sku       String
-  price     Int
-  imageUrl  String
-  label     String
-  createdAt DateTime    @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime    @updatedAt @db.Timestamptz(6)
+  id                  String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sku                 String
+  price               Int
+  imageUrl            String
+  label               String
+  createdAt           DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime    @updatedAt @db.Timestamptz(6)
 
-  productId String      @db.Uuid
-  product   Product?     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId           String      @db.Uuid
+  product             Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  inventory Inventory[]
+  inventory           Inventory[]
+  cartItem            CartItem[]
 
   @@map("variant")
 }
 
 model CategoriesOnProducts {
-  categoryId String   @db.Uuid
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId          String   @db.Uuid
+  category            Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  productId  String   @db.Uuid
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId           String   @db.Uuid
+  product             Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([productId, categoryId])
   @@map("CategoriesOnProduct")
@@ -114,4 +116,32 @@ model Category {
   product              CategoriesOnProducts[]
 
   @@map("category")
+}
+
+model Cart {
+  id                   String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId               String            @unique @db.Uuid
+  items                CartItem[]
+
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  @@map("cart")
+}
+
+model CartItem {
+  id                   String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  quantity             Int
+  
+  cartId               String            @db.Uuid
+  cart                 Cart              @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId            String            @db.Uuid
+  item                 ProductVariant    @relation(fields: [productId], references: [id])
+
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  @@unique([cartId, productId])
+  @@map("cartItem")
 }
