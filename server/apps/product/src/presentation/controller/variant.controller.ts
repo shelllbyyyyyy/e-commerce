@@ -39,7 +39,6 @@ export class VariantController {
     private readonly query: QueryBus,
     private readonly rmqService: RmqService,
     private readonly bufferService: ConvertBufferService,
-    private readonly inventoryService: InventoryService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -60,7 +59,9 @@ export class VariantController {
       imageUrl,
       sku,
       label,
+      quantity,
       file,
+      rpc.access_token,
     );
 
     try {
@@ -70,12 +71,6 @@ export class VariantController {
       >(command);
 
       this.rmqService.ack(context);
-
-      await this.inventoryService.addToInventory(
-        result.getId(),
-        { quantity },
-        data.access_token,
-      );
 
       const response = VariantMapper.toJson(result);
 

@@ -7,6 +7,7 @@ import { ProductVariant, ProductVariantService } from '@libs/domain';
 import { PRODUCT_IMAGE, UploadService } from '@libs/shared';
 
 import { AddProductVariantCommand } from './add-variant.command';
+import { InventoryService } from '../../service/inventory.service';
 
 @CommandHandler(AddProductVariantCommand)
 export class AddProductVariantHandler
@@ -14,11 +15,13 @@ export class AddProductVariantHandler
 {
   constructor(
     private readonly service: ProductVariantService,
+    private readonly inventoryService: InventoryService,
     private readonly uploadService: UploadService,
   ) {}
 
   async execute(command: AddProductVariantCommand): Promise<ProductVariant> {
-    const { slug, label, price, sku, imageFile } = command;
+    const { slug, label, price, sku, imageFile, access_token, quantity } =
+      command;
 
     try {
       const uploadImage = await this.uploadService.uploadImageToCloudinary(
@@ -26,13 +29,20 @@ export class AddProductVariantHandler
         PRODUCT_IMAGE,
       );
 
-      return await this.service.save({
+      const result = await this.service.save({
         sku,
         price,
         imageUrl: uploadImage.secure_url,
         slug,
         label,
       });
+
+      await this.inventoryService.addToInventory(
+        result.getId(),
+        { quantity },
+        access_token,
+      );
+      return result;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new RpcException(new BadRequestException(error.message));

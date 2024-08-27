@@ -75,7 +75,9 @@ export class ProductController {
       sku,
       category,
       label,
+      quantity,
       file,
+      rpc.access_token,
     );
 
     try {
@@ -84,14 +86,6 @@ export class ProductController {
       );
 
       this.rmqService.ack(context);
-
-      const variantId = result.getVariant()[0].getId();
-
-      await this.inventoryService.addToInventory(
-        variantId,
-        { quantity },
-        data.access_token,
-      );
 
       const response = ProductMapper.toJson(result);
 

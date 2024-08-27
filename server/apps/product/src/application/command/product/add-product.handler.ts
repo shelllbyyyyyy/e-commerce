@@ -7,6 +7,7 @@ import { Product, ProductService } from '@libs/domain';
 import { PRODUCT_IMAGE, UploadService } from '@libs/shared';
 
 import { AddProductCommand } from './add-product.command';
+import { InventoryService } from '../../service/inventory.service';
 
 @CommandHandler(AddProductCommand)
 export class AddProductHandler
@@ -14,6 +15,7 @@ export class AddProductHandler
 {
   constructor(
     private readonly service: ProductService,
+    private readonly inventoryService: InventoryService,
     private readonly uploadService: UploadService,
   ) {}
 
@@ -28,6 +30,8 @@ export class AddProductHandler
       sku,
       slug,
       imageFile,
+      quantity,
+      access_token,
     } = command;
 
     try {
@@ -46,6 +50,14 @@ export class AddProductHandler
         sku,
         label,
       });
+
+      const variantId = result.getVariant()[0].getId();
+
+      await this.inventoryService.addToInventory(
+        variantId,
+        { quantity },
+        access_token,
+      );
 
       return result;
     } catch (error) {

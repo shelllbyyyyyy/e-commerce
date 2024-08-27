@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
+import { ProductVariant } from '@libs/domain/product/entities/product-variant.entity';
+
 import { InventoryRepository } from '../repositories/inventory.repository';
 import { Inventory, InventoryStatus } from '../entities/inventory.entity';
-import { ProductVariantRepository } from '../../product/repositories/product-variant.repository';
+import { VariantResponse } from '@libs/shared';
 
 type UpdateStock = {
   productId: string;
@@ -13,21 +15,25 @@ type UpdateStock = {
 
 @Injectable()
 export class InventoryService {
-  constructor(
-    private readonly repository: InventoryRepository,
-    private readonly variantRepository: ProductVariantRepository,
-  ) {}
+  constructor(private readonly repository: InventoryRepository) {}
 
-  async addToInventory(
-    productId: string,
-    quantity: number,
-  ): Promise<Inventory> {
-    const vairant = await this.variantRepository.findById(productId);
+  async addToInventory(variant: unknown, quantity: number): Promise<Inventory> {
+    const { id, sku, price, imageUrl, label, productId } =
+      variant as VariantResponse;
+
+    const item = ProductVariant.create({
+      id,
+      sku,
+      price,
+      imageUrl,
+      label,
+      productId,
+    });
 
     const add = Inventory.addToInventory({
       id: randomUUID(),
       quantity,
-      item: vairant,
+      item: item,
     });
 
     return await this.repository.addToInventory(add);
