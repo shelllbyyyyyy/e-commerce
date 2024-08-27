@@ -81,6 +81,46 @@ export class Address {
     return this.updatedAt;
   }
 
+  static addAddress({
+    id,
+    first_name,
+    last_name,
+    phone_number,
+    street,
+    city,
+    state,
+    postal_code,
+    country_code,
+    userId,
+    mapUrl,
+  }: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    street: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    country_code: string;
+    userId: string;
+    mapUrl?: string;
+  }): Address {
+    return new Address(
+      id,
+      first_name,
+      last_name,
+      phone_number,
+      street,
+      city,
+      state,
+      postal_code,
+      country_code,
+      userId,
+      mapUrl,
+    );
+  }
+
   updateAddress({
     first_name,
     last_name,

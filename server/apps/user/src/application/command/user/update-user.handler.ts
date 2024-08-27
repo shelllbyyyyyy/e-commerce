@@ -1,11 +1,12 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { RpcException } from '@nestjs/microservices';
+import { Prisma } from '@prisma/client';
 
 import { User, UserService } from '@libs/domain';
+import { PROFILE_PICTURE, UploadService } from '@libs/shared';
 
 import { UpdateUserCommand } from './update-user.command';
-import { RpcException } from '@nestjs/microservices';
-import { PROFILE_PICTURE, UploadService } from '@libs/shared';
 
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserHandler
@@ -46,13 +47,13 @@ export class UpdateUserHandler
 
       const update = await this.service.updateById(data);
 
-      if (!update) {
-        throw new BadRequestException('something wrong');
-      }
-
       return update;
     } catch (error) {
-      new RpcException(error);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new RpcException(new BadRequestException(error.message));
+      } else {
+        throw new RpcException(new BadRequestException('Something wrong'));
+      }
     }
   }
 }

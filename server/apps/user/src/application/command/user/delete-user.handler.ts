@@ -1,9 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { BadRequestException } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { Prisma } from '@prisma/client';
 
 import { UserService } from '@libs/domain';
 
 import { DeleteUserCommand } from './delete-user.command';
-import { RpcException } from '@nestjs/microservices';
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler
@@ -19,7 +21,11 @@ export class DeleteUserHandler
 
       return true;
     } catch (error) {
-      new RpcException(error);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new RpcException(new BadRequestException(error.message));
+      } else {
+        throw error;
+      }
     }
   }
 }

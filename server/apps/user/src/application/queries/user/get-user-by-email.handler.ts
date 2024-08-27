@@ -4,19 +4,18 @@ import { RpcException } from '@nestjs/microservices';
 import { Prisma } from '@prisma/client';
 
 import { User, UserService } from '@libs/domain';
+import { GetUserByEmailQuery } from './get-user-by-email.query';
 
-import { GetUserByIdQuery } from './get-user-by-id.query';
-
-@QueryHandler(GetUserByIdQuery)
-export class GetUserByIdHandler
-  implements IQueryHandler<GetUserByIdQuery, User>
+@QueryHandler(GetUserByEmailQuery)
+export class GetUserByEmailHandler
+  implements IQueryHandler<GetUserByEmailQuery, User>
 {
   constructor(private readonly service: UserService) {}
 
-  async execute(query: GetUserByIdQuery): Promise<User> {
-    const { id } = query;
+  async execute(query: GetUserByEmailQuery): Promise<User> {
+    const { email } = query;
     try {
-      return await this.service.findById(id);
+      return await this.service.findByEmailWithPassword(email);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new RpcException(new BadRequestException(error.message));

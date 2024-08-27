@@ -2,13 +2,27 @@ import { Injectable } from '@nestjs/common';
 
 import { UserRepository } from '../repositories/user-repository';
 import { User } from '../entities/user.entity';
+import { randomUUID } from 'crypto';
+
+type Register = {
+  username: string;
+  email: string;
+  password: string;
+};
 
 @Injectable()
 export class UserService {
   constructor(private readonly repository: UserRepository) {}
 
-  async save(data: User): Promise<User> {
-    return await this.repository.save(data);
+  async save({ email, password, username }: Register): Promise<User> {
+    const newUser = User.createUser({
+      id: randomUUID(),
+      username,
+      email,
+      password,
+      isVerified: false,
+    });
+    return await this.repository.save(newUser);
   }
 
   async findById(id: string): Promise<User> {

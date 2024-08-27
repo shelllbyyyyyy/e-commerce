@@ -24,11 +24,15 @@ import {
 } from '@libs/shared';
 
 import { UpdateUserDTO } from '@/root/user/dtos/update-user.dto';
+import { RegisterDTO } from '@/root/auth/dtos/register.dto';
 
 import { GetUserQuery } from '@/user/application/queries/user/get-user.query';
 import { GetUserByIdQuery } from '@/user/application/queries/user/get-user-by-id.query';
 import { UpdateUserCommand } from '@/user/application/command/user/update-user.command';
 import { DeleteUserCommand } from '@/user/application/command/user/delete-user.command';
+import { GetUserByEmailQuery } from '@/user/application/queries/user/get-user-by-email.query';
+import { VerifyUserCommand } from '@/user/application/command/user/verify-user.command';
+import { CreateUserCommand } from '@/user/application/command/user/create-user.command';
 
 @Controller('user')
 @UseFilters(new RpcExceptionFilter())
@@ -126,6 +130,66 @@ export class UserController {
       return newAddress;
     } catch (error) {
       throw new RpcException(new BadRequestException('Delete user failed'));
+    }
+  }
+
+  @MessagePattern('existing_user')
+  async handleCheckExistingUser(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ): Promise<User | null> {
+    const rpc = RpcRequestHandler.execute(data);
+    const query = new GetUserByEmailQuery(rpc.param);
+
+    try {
+      const result = await this.queryBus.execute<GetUserByEmailQuery, User>(
+        query,
+      );
+
+      this.rmqService.ack(context);
+
+      return result;
+    } catch (error) {
+      throw new RpcException(new BadRequestException('User not found'));
+    }
+  }
+
+  @MessagePattern('verify_user')
+  async handleVerifyUser(@Payload() data: any, @Ctx() context: RmqContext) {
+    const rpc = RpcRequestHandler.execute(data);
+    const command = new VerifyUserCommand(rpc.param);
+
+    try {
+      const result = await this.commandBus.execute<VerifyUserCommand, boolean>(
+        command,
+      );
+
+      this.rmqService.ack(context);
+
+      return result;
+    } catch (error) {
+      throw new RpcException(new BadRequestException('User not found'));
+    }
+  }
+
+  @MessagePattern('create_user')
+  async handleCreateUser(@Payload() data: any, @Ctx() context: RmqContext) {
+    const rpc = RpcRequestHandler.execute<RegisterDTO>(data);
+
+    const { email, password, username } = rpc.request;
+
+    const command = new CreateUserCommand(username, email, password);
+
+    try {
+      const result = await this.commandBus.execute<CreateUserCommand, User>(
+        command,
+      );
+
+      this.rmqService.ack(context);
+
+      return result;
+    } catch (error) {
+      throw new RpcException(new BadRequestException('Create user failed'));
     }
   }
 }

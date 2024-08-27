@@ -1,8 +1,11 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { GetUserQuery } from './get-user.query';
-import { User, UserService } from '@libs/domain';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
+
+import { User, UserService } from '@libs/domain';
+
+import { GetUserQuery } from './get-user.query';
+import { Prisma } from '@prisma/client';
 
 @QueryHandler(GetUserQuery)
 export class GetUserHandler implements IQueryHandler<GetUserQuery, User> {
@@ -11,15 +14,13 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery, User> {
   async execute(query: GetUserQuery): Promise<User> {
     const { userId } = query;
     try {
-      const user = await this.service.findById(userId);
-
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-
-      return user;
+      return await this.service.findById(userId);
     } catch (error) {
-      throw new RpcException(new NotFoundException('User not found'));
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new RpcException(new BadRequestException(error.message));
+      } else {
+        throw new RpcException(new NotFoundException('User not found'));
+      }
     }
   }
 }

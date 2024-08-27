@@ -1,10 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { Prisma } from '@prisma/client';
 
 import { Address, AddressService } from '@libs/domain';
 
 import { UpdateAddressCommand } from './update-address.command';
-import { RpcException } from '@nestjs/microservices';
 
 @CommandHandler(UpdateAddressCommand)
 export class UpdateAddressHandler
@@ -24,27 +25,27 @@ export class UpdateAddressHandler
       street,
       mapUrl,
     } = command;
-
-    const address = await this.addressService.findById(id);
-    if (!address) throw new NotFoundException('User not found');
-
-    const newAddress = address.updateAddress({
-      first_name,
-      last_name,
-      phone_number,
-      street,
-      city,
-      state,
-      postal_code,
-      country_code,
-      mapUrl,
-    });
     try {
-      const updateProfile = await this.addressService.update(newAddress);
+      const updateProfile = await this.addressService.update({
+        city,
+        country_code,
+        first_name,
+        last_name,
+        mapUrl,
+        phone_number,
+        postal_code,
+        state,
+        street,
+        id,
+      });
 
       return updateProfile;
     } catch (error) {
-      throw new RpcException(error);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new RpcException(new BadRequestException(error.message));
+      } else {
+        throw error;
+      }
     }
   }
 }

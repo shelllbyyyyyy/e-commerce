@@ -1,18 +1,17 @@
+import { BadRequestException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { RpcException } from '@nestjs/microservices';
+import { Prisma } from '@prisma/client';
 
-import { AddressService, UserService } from '@libs/domain';
+import { AddressService } from '@libs/domain';
 
 import { DeleteAddressCommand } from './delete-address.command';
-import { RpcException } from '@nestjs/microservices';
 
 @CommandHandler(DeleteAddressCommand)
 export class DeleteAddressHandler
   implements ICommandHandler<DeleteAddressCommand, string>
 {
-  constructor(
-    private readonly userService: UserService,
-    private readonly addressService: AddressService,
-  ) {}
+  constructor(private readonly addressService: AddressService) {}
   async execute(command: DeleteAddressCommand): Promise<string> {
     const { id } = command;
 
@@ -21,7 +20,11 @@ export class DeleteAddressHandler
 
       return deleteProfile;
     } catch (error) {
-      throw new RpcException(error);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new RpcException(new BadRequestException(error.message));
+      } else {
+        throw error;
+      }
     }
   }
 }

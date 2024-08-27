@@ -85,6 +85,22 @@ export class User {
     return this.order;
   }
 
+  static createUser({
+    id,
+    username,
+    email,
+    password,
+    isVerified,
+  }: {
+    id: string;
+    username: string;
+    email: string;
+    password: string;
+    isVerified: boolean;
+  }): User {
+    return new User(id, username, email, password, isVerified);
+  }
+
   updateUser({
     display_name,
     profile_picture,

@@ -1,10 +1,11 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { Prisma } from '@prisma/client';
 
 import { Address, AddressService } from '@libs/domain';
 
 import { GetAddressQuery } from './get-address.query';
-import { RpcException } from '@nestjs/microservices';
 
 @QueryHandler(GetAddressQuery)
 export class GetAddressHandler
@@ -20,7 +21,13 @@ export class GetAddressHandler
 
       return address;
     } catch (error) {
-      throw new RpcException(new NotFoundException('Address not found'));
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new RpcException(new BadRequestException(error.message));
+      } else {
+        throw new RpcException(
+          new NotFoundException("You don't have any address"),
+        );
+      }
     }
   }
 }
