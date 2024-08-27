@@ -1,7 +1,8 @@
+import { UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { UnauthorizedException } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 
 import { RefreshCommand } from './refresh.command';
 
@@ -32,7 +33,9 @@ export class RefreshHandler
 
       return { access_token: newAccessToken };
     } catch (e) {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new RpcException(
+        new UnauthorizedException('Invalid or expired refresh token'),
+      );
     }
   }
 }

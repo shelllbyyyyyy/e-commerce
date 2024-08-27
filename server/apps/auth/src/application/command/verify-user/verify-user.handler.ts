@@ -4,9 +4,8 @@ import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
 import { BadRequestException } from '@nestjs/common';
 
-import { UserService } from '@libs/domain';
-
 import { VerifyUserCommand } from './verify-user.command';
+import { AuthService } from '../../service/auth.service';
 
 @CommandHandler(VerifyUserCommand)
 export class VerifyUserHandler
@@ -14,7 +13,7 @@ export class VerifyUserHandler
 {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userService: UserService,
+    private readonly authService: AuthService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -25,7 +24,7 @@ export class VerifyUserHandler
         secret: this.configService.get<string>('VERIFY_TOKEN_SECRET'),
       });
 
-      await this.userService.verifyUser(decode.sub);
+      await this.authService.verifyUser(decode.sub);
 
       return true;
     } catch (error) {

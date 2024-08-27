@@ -3,11 +3,12 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
+import { Prisma } from '@prisma/client';
 
-import { UserService } from '@libs/domain';
 import { EmailService } from '@libs/shared';
 
 import { ResendVerificationQuery } from './resend-varification.query';
+import { AuthService } from '../../service/auth.service';
 
 @QueryHandler(ResendVerificationQuery)
 export class ResendVerificationHandler
@@ -15,16 +16,16 @@ export class ResendVerificationHandler
 {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userService: UserService,
     private readonly configService: ConfigService,
     private readonly sendEmail: EmailService,
+    private readonly authService: AuthService,
   ) {}
 
   async execute(query: ResendVerificationQuery): Promise<boolean> {
     const { email } = query;
 
     try {
-      const user = await this.userService.findByEmail(email);
+      const user = await this.authService.checkUser(email);
 
       if (user) {
         const payload = { sub: user.getId() };
@@ -38,7 +39,11 @@ export class ResendVerificationHandler
 
       return true;
     } catch (error) {
-      throw new RpcException(new BadRequestException('User not found'));
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new RpcException(new BadRequestException(error.message));
+      } else {
+        throw new RpcException(new BadRequestException('User not found'));
+      }
     }
   }
 }

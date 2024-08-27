@@ -1,6 +1,9 @@
+import { BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
+import { RpcException } from '@nestjs/microservices';
+import { Prisma } from '@prisma/client';
 
 import { LoginCommand } from './login.command';
 import { AuthService } from '../../service/auth.service';
@@ -24,22 +27,31 @@ export class LoginHandler
   ): Promise<{ access_token: string; refresh_token: string }> {
     const { email, password } = command;
 
-    const user = await this.service.validateUserCredentials(email, password);
-    const payload = { email: user.getEmail(), sub: user.getId() };
+    try {
+      const user = await this.service.validateUserCredentials(email, password);
 
-    const access_token = this.jwtService.sign(payload, {
-      secret: this.configService.get('ACCESS_TOKEN_SECRET'),
-      expiresIn: '1h',
-    });
+      const payload = { email: user.email, sub: user.id };
 
-    const refresh_token = this.jwtService.sign(payload, {
-      secret: this.configService.get('REFRESH_TOKEN_SECRET'),
-      expiresIn: '7d',
-    });
+      const access_token = this.jwtService.sign(payload, {
+        secret: this.configService.get('ACCESS_TOKEN_SECRET'),
+        expiresIn: '1h',
+      });
 
-    return {
-      access_token: access_token,
-      refresh_token: refresh_token,
-    };
+      const refresh_token = this.jwtService.sign(payload, {
+        secret: this.configService.get('REFRESH_TOKEN_SECRET'),
+        expiresIn: '7d',
+      });
+
+      return {
+        access_token: access_token,
+        refresh_token: refresh_token,
+      };
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new RpcException(new BadRequestException(error.message));
+      } else {
+        throw new RpcException(new BadRequestException('Something wrong'));
+      }
+    }
   }
 }

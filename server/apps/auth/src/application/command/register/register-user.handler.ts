@@ -3,22 +3,22 @@ import {
   BadRequestException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { RpcException } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
 
-import { User, UserService } from '@libs/domain';
+import { User } from '@libs/domain';
 import { BcryptService, EmailService } from '@libs/shared';
 
 import { RegisterUserCommand } from './register-user.command';
+import { AuthService } from '../../service/auth.service';
 
 @CommandHandler(RegisterUserCommand)
 export class RegisterUserHandler
   implements ICommandHandler<RegisterUserCommand, User>
 {
   constructor(
-    private readonly service: UserService,
+    private readonly authService: AuthService,
     private readonly bcrypt: BcryptService,
     private readonly sendEmail: EmailService,
     private readonly jwtService: JwtService,
@@ -28,28 +28,29 @@ export class RegisterUserHandler
   async execute(command: RegisterUserCommand): Promise<User> {
     const { email, password, username } = command;
 
-    const existingUser = await this.service.findByEmail(email);
-    if (existingUser) {
-      throw new UnprocessableEntityException('Email already registered');
-    }
-
     try {
-      const id = randomUUID();
+      const existingUser = await this.authService.checkUser(email);
+
+      if (existingUser) {
+        throw new UnprocessableEntityException('Email already registered');
+      }
 
       const hashPassword = await this.bcrypt.hashPassword(password);
 
-      const newUser = new User(id, username, email, hashPassword, false);
-
-      const register = await this.service.save(newUser);
+      const register = await this.authService.register({
+        email,
+        username,
+        password: hashPassword,
+      });
 
       if (register) {
-        const payload = { sub: register.getId() };
+        const payload = { sub: register.id };
 
         const token = await this.jwtService.signAsync(payload, {
           expiresIn: '1m',
           secret: this.configService.get<string>('VERIFY_TOKEN_SECRET'),
         });
-        await this.sendEmail.sendUserWelcome(newUser, token);
+        await this.sendEmail.sendUserWelcome(register, token);
       }
 
       return register;
