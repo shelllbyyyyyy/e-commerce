@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
-import { InventoryRepository } from '@libs/domain/product/repositories/inventory.repository';
+import { InventoryRepository } from '@libs/domain/inventory/repositories/inventory.repository';
 import { ProductVariantRepository } from '@libs/domain/product/repositories/product-variant.repository';
 
 import { CartRepository } from '../repositories/cart.repository';
 import { CartItem } from '../entities/cart-item.entity';
 import { Cart } from '../entities/cart.entity';
-import { InventoryStatus } from '@libs/domain/product/entities/inventory.entity';
+import { InventoryStatus } from '@libs/domain/inventory/entities/inventory.entity';
 
 type AddToCart = {
   userId: string;

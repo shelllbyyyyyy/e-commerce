@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 
 import { InventoryRepository } from '../repositories/inventory.repository';
 import { Inventory, InventoryStatus } from '../entities/inventory.entity';
-import { ProductVariantRepository } from '../repositories/product-variant.repository';
+import { ProductVariantRepository } from '../../product/repositories/product-variant.repository';
 
 type UpdateStock = {
   productId: string;

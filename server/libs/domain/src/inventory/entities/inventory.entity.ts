@@ -1,5 +1,5 @@
-import { Quantity } from '../values-object/quantity';
-import { ProductVariant } from './product-variant.entity';
+import { Quantity } from '../../product/values-object/quantity';
+import { ProductVariant } from '../../product/entities/product-variant.entity';
 
 export enum InventoryStatus {
   AVAILABLE,

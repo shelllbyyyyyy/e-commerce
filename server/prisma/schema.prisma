@@ -21,6 +21,7 @@ model User {
 
   address           Address[]
   cart              Cart?
+  order             Order[]
 
   @@map("user")
 }
@@ -40,7 +41,7 @@ model Address {
   updatedAt         DateTime        @updatedAt @db.Timestamptz(6)
 
   userId        String   @db.Uuid
-  user          User     @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("address")
 }
@@ -92,6 +93,7 @@ model ProductVariant {
 
   inventory           Inventory[]
   cartItem            CartItem[]
+  orderProduct        OrderProduct[]
 
   @@map("variant")
 }
@@ -104,7 +106,7 @@ model CategoriesOnProducts {
   product             Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([productId, categoryId])
-  @@map("CategoriesOnProduct")
+  @@map("categoriesOnProduct")
 }
 
 model Category {
@@ -144,4 +146,42 @@ model CartItem {
 
   @@unique([cartId, productId])
   @@map("cartItem")
+}
+
+model Order {
+  id                   String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  status               OrderStatus
+  totalAmount          Float
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  user                 User              @relation( fields: [userId], references: [id], onDelete: Cascade)
+  userId               String            @db.Uuid
+
+  items                OrderProduct[]
+
+  @@map("order")
+}
+
+model OrderProduct {
+  id                   String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  quantity             Int
+  price                Float
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  orderId              String            @db.Uuid
+  order                Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  itemId               String            @db.Uuid
+  item                 ProductVariant    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, itemId])
+  @@map("orderProduct")
+}
+
+enum OrderStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }

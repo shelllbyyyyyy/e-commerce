@@ -16,7 +16,7 @@ export class CartItemMapper {
     return {
       cartId: data.getCartId(),
       item: data.getItem(),
-      quantity: data.getQuantity(),
+      quantity: data.getQuantity().getValue(),
     };
   }
 

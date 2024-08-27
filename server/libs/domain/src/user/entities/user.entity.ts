@@ -1,5 +1,6 @@
 import { Cart } from '@libs/domain/cart/entities/cart.entity';
 import { Address } from './address.entity';
+import { Order } from '@libs/domain/order/entities/order.entity';
 
 export class User {
   constructor(
@@ -15,7 +16,7 @@ export class User {
     private readonly updatedAt?: Date,
     private readonly address?: Address[] | undefined,
     private readonly cart?: Cart,
-    private readonly order?: string,
+    private readonly order?: Order[],
   ) {
     this.id = id;
     this.username = username;
@@ -80,7 +81,7 @@ export class User {
     return this.cart;
   }
 
-  getOrder(): string {
+  getOrder(): Order[] {
     return this.order;
   }
 

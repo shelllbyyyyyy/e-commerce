@@ -30,7 +30,11 @@ export class GatewayRpcExceptionFilter
     const statusCode = error.response.statusCode;
     const user = data.user?.email;
 
-    this.logger.log(`[${user}]: ${exception.message} `);
+    this.logger.error(`[${user}]: ${exception.message} `);
+
+    if (statusCode === null) {
+      response.status(500).json('Internal Server Error');
+    }
 
     response.status(statusCode).json(error.response);
   }

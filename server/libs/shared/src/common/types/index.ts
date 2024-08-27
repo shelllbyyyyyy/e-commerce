@@ -1,4 +1,5 @@
 import { InventoryStatus } from '@libs/domain';
+import { OrderStatus } from '@libs/domain/order/entities/order.entity';
 
 export type ProductResponse = {
   id: string;
@@ -37,4 +38,22 @@ export type CartItemResponse = {
   id: string;
   item: VariantResponse;
   quantity: number;
+};
+
+export type OrderResponse = {
+  id: string;
+  userId: string;
+  items: OrderProductResponse[];
+  total_amount: number;
+  status: OrderStatus;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+export type OrderProductResponse = {
+  id: string;
+  orderId: string;
+  item: VariantResponse;
+  quantity: number;
+  price: number;
 };

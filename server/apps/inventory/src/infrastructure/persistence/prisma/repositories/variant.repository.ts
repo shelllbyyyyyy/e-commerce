@@ -19,6 +19,14 @@ export class ProductVariantRepositoryImpl implements ProductVariantRepository {
     return VariantMapper.toDomain(result);
   }
 
+  async findMany(id: string[]): Promise<ProductVariant[]> {
+    const results = await this.service.productVariant.findMany({
+      where: { id: { in: id } },
+    });
+
+    return results.map((value) => VariantMapper.toDomain(value));
+  }
+
   async save(data: ProductVariant): Promise<ProductVariant> {
     const payload: Prisma.ProductVariantCreateInput =
       VariantMapper.toPrisma(data);
