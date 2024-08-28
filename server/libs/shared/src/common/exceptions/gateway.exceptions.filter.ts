@@ -27,15 +27,18 @@ export class GatewayRpcExceptionFilter
     const ctx = host.switchToHttp();
     const data = host.switchToRpc().getData();
     const response = ctx.getResponse<Response>();
-    const statusCode = error.response.statusCode;
+    const statusCode = error?.response?.statusCode;
     const user = data.user?.email;
 
     this.logger.error(`[${user}]: ${exception.message} `);
 
-    if (statusCode === null) {
-      response.status(500).json('Internal Server Error');
+    if (statusCode === undefined) {
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal Server Error',
+      });
+    } else {
+      response.status(statusCode).json(error.response);
     }
-
-    response.status(statusCode).json(error.response);
   }
 }
