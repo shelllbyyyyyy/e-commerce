@@ -58,6 +58,7 @@ export class CartRepositoryImpl implements CartRepository {
       },
       include: { item: true },
     });
+
     return CartItemMapper.toDomain(result);
   }
 
@@ -83,9 +84,9 @@ export class CartRepositoryImpl implements CartRepository {
       where: { id: cartItemId },
     });
 
-    if (result) return true;
+    if (!result) return false;
 
-    return false;
+    return true;
   }
 
   async updateQuantity(
@@ -101,6 +102,17 @@ export class CartRepositoryImpl implements CartRepository {
       },
       include: { item: true },
     });
+    return CartItemMapper.toDomain(result);
+  }
+
+  async findCartItemById(cartItemId: string): Promise<CartItem> {
+    const result = await this.service.cartItem.findUnique({
+      where: { id: cartItemId },
+      include: {
+        item: true,
+      },
+    });
+
     return CartItemMapper.toDomain(result);
   }
 

@@ -5,20 +5,29 @@ import { BadRequestException } from '@nestjs/common';
 import { CartItem, CartService } from '@libs/domain';
 
 import { AddToCartCommand } from './add-to-cart.command';
+import { InventoryService } from '../../service/inventory.service';
 
 @CommandHandler(AddToCartCommand)
 export class AddToCartHandler
   implements ICommandHandler<AddToCartCommand, CartItem>
 {
-  constructor(private readonly cartService: CartService) {}
+  constructor(
+    private readonly cartService: CartService,
+    private readonly inventoryService: InventoryService,
+  ) {}
 
   async execute(command: AddToCartCommand): Promise<CartItem> {
-    const { productId, quantity, userId } = command;
+    const { productId, quantity, userId, access_token } = command;
 
     try {
-      return await this.cartService.addToCart({ productId, quantity, userId });
+      const inventory = await this.inventoryService.getStockProduct(
+        productId,
+        access_token,
+      );
+
+      return await this.cartService.addToCart({ inventory, quantity, userId });
     } catch (error) {
-      throw new RpcException(new BadRequestException());
+      throw new RpcException(new BadRequestException('Insufficient stock'));
     }
   }
 }

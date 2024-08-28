@@ -1,44 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
-import { InventoryRepository } from '@libs/domain/inventory/repositories/inventory.repository';
-import { ProductVariantRepository } from '@libs/domain/product/repositories/product-variant.repository';
+import { InventoryStatus } from '@libs/domain/inventory/entities/inventory.entity';
+import { ProductVariant } from '@libs/domain/product/entities/product-variant.entity';
+import { InventoryResponse } from '@libs/shared';
 
 import { CartRepository } from '../repositories/cart.repository';
 import { CartItem } from '../entities/cart-item.entity';
 import { Cart } from '../entities/cart.entity';
-import { InventoryStatus } from '@libs/domain/inventory/entities/inventory.entity';
 
 type AddToCart = {
   userId: string;
-  productId: string;
+  inventory: InventoryResponse;
   quantity: number;
 };
 
 type UpdateCart = {
   cartItemId: string;
   quantity: number;
+  inventory: InventoryResponse;
 };
 
 @Injectable()
 export class CartService {
-  constructor(
-    private readonly cartRepository: CartRepository,
-    private readonly productVariantRepository: ProductVariantRepository,
-    private readonly inventoryRepository: InventoryRepository,
-  ) {}
+  constructor(private readonly cartRepository: CartRepository) {}
 
   async addToCart({
-    productId,
+    inventory,
     quantity,
     userId,
   }: AddToCart): Promise<CartItem> {
     let cart: Cart;
-    const checkStock =
-      await this.inventoryRepository.getStockProduct(productId);
 
-    const currentQuantity = checkStock.getQuantity().getValue();
-    const status = checkStock.getStatus();
+    const currentQuantity = inventory.quantity;
+    const status = inventory.status;
 
     if (currentQuantity < quantity || status !== InventoryStatus.AVAILABLE) {
       throw new Error('Insufficient stock');
@@ -54,21 +49,38 @@ export class CartService {
 
     const cartItem = await this.cartRepository.findCartItem(
       cart.getId(),
-      productId,
+      inventory.item.id,
     );
 
     if (!cartItem) {
-      const product = await this.productVariantRepository.findById(productId);
+      const { id, imageUrl, label, price, productId, sku } = inventory.item;
+      const item = ProductVariant.create({
+        id,
+        sku,
+        price,
+        imageUrl,
+        label,
+        productId,
+      });
 
       const newItem = CartItem.newItem({
         id: randomUUID(),
         cartId: cart.getId(),
-        item: product,
+        item: item,
         quantity,
       });
 
       return await this.cartRepository.addToCart(newItem);
     } else {
+      const cartQuantity = cartItem.getQuantity().getValue() + quantity;
+
+      if (
+        currentQuantity < cartQuantity ||
+        status !== InventoryStatus.AVAILABLE
+      ) {
+        throw new Error('Insufficient stock');
+      }
+
       return await this.cartRepository.updateQuantity(
         cartItem.getId(),
         quantity,
@@ -80,11 +92,27 @@ export class CartService {
     return await this.cartRepository.findByUserId(userId);
   }
 
+  async findCartItemById(cartItemId: string): Promise<CartItem> {
+    return await this.cartRepository.findCartItemById(cartItemId);
+  }
+
   async updateQuantity({
     cartItemId,
     quantity,
-  }: UpdateCart): Promise<CartItem> {
-    return await this.cartRepository.updateCart(cartItemId, quantity);
+    inventory,
+  }: UpdateCart): Promise<void> {
+    const currentQuantity = inventory.quantity;
+    const status = inventory.status;
+
+    if (currentQuantity < quantity || status !== InventoryStatus.AVAILABLE) {
+      throw new Error('Insufficient stock');
+    }
+
+    const update = await this.cartRepository.updateCart(cartItemId, quantity);
+
+    if (update.getQuantity().getValue() === 0) {
+      await this.cartRepository.deleteCartItem(cartItemId);
+    }
   }
 
   async deleteCartItem(cartItemId: string): Promise<boolean> {

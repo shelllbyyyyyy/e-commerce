@@ -66,7 +66,12 @@ export class CartController {
 
     const { productId, quantity } = rpc.request;
 
-    const command = new AddToCartCommand(rpc.user.sub, productId, quantity);
+    const command = new AddToCartCommand(
+      rpc.user.sub,
+      productId,
+      quantity,
+      rpc.access_token,
+    );
 
     try {
       const result = await this.command.execute<AddToCartCommand, CartItem>(
@@ -77,7 +82,7 @@ export class CartController {
 
       return result;
     } catch (error) {
-      throw new RpcException(new BadRequestException());
+      throw new RpcException(new BadRequestException('Insufficient stock'));
     }
   }
 
@@ -90,7 +95,11 @@ export class CartController {
 
     const { quantity } = rpc.request;
 
-    const command = new UpdateCartCommand(cartItemId, quantity);
+    const command = new UpdateCartCommand(
+      cartItemId,
+      quantity,
+      rpc.access_token,
+    );
 
     try {
       const result = await this.command.execute<UpdateCartCommand, CartItem>(
@@ -101,7 +110,7 @@ export class CartController {
 
       return result;
     } catch (error) {
-      throw new RpcException(new BadRequestException());
+      throw new RpcException(new BadRequestException('Insufficient stock'));
     }
   }
 

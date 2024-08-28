@@ -2,9 +2,9 @@ import { Quantity } from '../../product/values-object/quantity';
 import { ProductVariant } from '../../product/entities/product-variant.entity';
 
 export enum InventoryStatus {
-  AVAILABLE,
-  ON_ORDER,
-  RESERVED,
+  AVAILABLE = 'AVAILABLE',
+  ON_ORDER = 'ON_ORDER',
+  RESERVED = 'RESERVED',
 }
 
 export class Inventory {

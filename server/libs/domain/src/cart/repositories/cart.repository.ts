@@ -12,6 +12,7 @@ export abstract class CartRepository {
   ): Promise<CartItem>;
   abstract updateCart(cartItemId: string, quantity: number): Promise<CartItem>;
   abstract findCartItem(cartId: string, productId: string): Promise<CartItem>;
+  abstract findCartItemById(cartItemId: string): Promise<CartItem>;
   abstract findByUserId(userId: string): Promise<Cart>;
   abstract deleteCartItem(cartItemId: string): Promise<boolean>;
 }

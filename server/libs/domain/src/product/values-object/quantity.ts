@@ -1,6 +1,6 @@
 export class Quantity {
   constructor(private readonly value: number) {
-    if (value <= 0) throw new Error('Quantity must be greater than zero');
+    if (value < 0) throw new Error('Quantity cannot be negative');
   }
 
   getValue(): number {
