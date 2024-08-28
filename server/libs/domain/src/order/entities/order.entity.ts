@@ -1,10 +1,10 @@
 import { OrderProduct } from './order-product.entity';
 
 export enum OrderStatus {
-  PENDING,
-  SHIPPED,
-  DELIVERED,
-  CANCELLED,
+  PENDING = 'PENDING',
+  SHIPPED = 'SHIPPED',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
 }
 
 export class Order {

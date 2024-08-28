@@ -118,4 +118,12 @@ export class CartService {
   async deleteCartItem(cartItemId: string): Promise<boolean> {
     return await this.cartRepository.deleteCartItem(cartItemId);
   }
+
+  async deleteCartItems(cartItemId: string[]): Promise<boolean> {
+    return await this.cartRepository.deleteCartItems(cartItemId);
+  }
+
+  async getCartItems(cartItemId: string[]): Promise<CartItem[]> {
+    return await this.cartRepository.getCartItems(cartItemId);
+  }
 }

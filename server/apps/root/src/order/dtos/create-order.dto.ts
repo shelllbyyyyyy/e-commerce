@@ -1,12 +1,18 @@
 import { Transform } from 'class-transformer';
-import { IsArray, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateOrderDTO {
   @IsArray()
   @IsString({ each: true })
-  readonly productId: string[];
+  @IsOptional()
+  readonly cartItemId?: string[];
+
+  @IsString()
+  @IsOptional()
+  readonly productId?: string;
 
   @IsNumber()
   @Transform(({ value }) => parseInt(value))
-  readonly quantity: number;
+  @IsOptional()
+  readonly quantity?: number;
 }

@@ -7,6 +7,7 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import {
+  CartItemMapper,
   CartMapper,
   JwtAuthGuard,
   RmqService,
@@ -29,6 +30,8 @@ import { GetCartQuery } from '@/cart/application/queries/cart/get-cart.query';
 
 import { AddToCartDTO } from '@/root/cart/dtos/add-to-cart.dto';
 import { UpdateCartDTO } from '@/root/cart/dtos/update-cart.dto';
+import { GetCartItemsQuery } from '@/cart/application/queries/cart/get-cart-items.query';
+import { DeleteCartItemsCommand } from '@/cart/application/command/cart/delete-cart-items.command';
 
 @Controller('cart')
 @UseFilters(new RpcExceptionFilter())
@@ -52,6 +55,28 @@ export class CartController {
       this.rmqService.ack(context);
 
       const response = CartMapper.toJson(result);
+
+      return response;
+    } catch (error) {
+      throw new RpcException(new BadRequestException());
+    }
+  }
+
+  @MessagePattern('get_cart_items')
+  @UseGuards(JwtAuthGuard)
+  async handleGetCartItems(@Payload() data: any, @Ctx() context: RmqContext) {
+    const rpc = RpcRequestHandler.execute<{ cartItemId: string[] }>(data);
+
+    const query = new GetCartItemsQuery(rpc.request.cartItemId);
+
+    try {
+      const result = await this.query.execute<GetCartItemsQuery, CartItem[]>(
+        query,
+      );
+
+      this.rmqService.ack(context);
+
+      const response = result.map((value) => CartItemMapper.toJson(value));
 
       return response;
     } catch (error) {
@@ -125,6 +150,30 @@ export class CartController {
       const result = await this.command.execute<DeleteCartItemCommand, boolean>(
         command,
       );
+
+      this.rmqService.ack(context);
+
+      return result;
+    } catch (error) {
+      throw new RpcException(new BadRequestException());
+    }
+  }
+
+  @MessagePattern('delete_cart_items')
+  @UseGuards(JwtAuthGuard)
+  async handleDeleteCartItems(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ) {
+    const rpc = RpcRequestHandler.execute<{ cartItemId: string[] }>(data);
+
+    const command = new DeleteCartItemsCommand(rpc.request.cartItemId);
+
+    try {
+      const result = await this.command.execute<
+        DeleteCartItemsCommand,
+        boolean
+      >(command);
 
       this.rmqService.ack(context);
 

@@ -126,4 +126,25 @@ export class CartRepositoryImpl implements CartRepository {
 
     return CartMapper.toDomain(result);
   }
+
+  async getCartItems(cartItemId: string[]): Promise<CartItem[]> {
+    const result = await this.service.cartItem.findMany({
+      where: {
+        id: { in: cartItemId },
+      },
+      include: { item: true },
+    });
+
+    return result.map((value) => CartItemMapper.toDomain(value));
+  }
+
+  async deleteCartItems(cartItemId: string[]): Promise<boolean> {
+    const result = await this.service.cartItem.deleteMany({
+      where: { id: { in: cartItemId } },
+    });
+
+    if (!result) return false;
+
+    return true;
+  }
 }

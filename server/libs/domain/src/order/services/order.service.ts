@@ -1,50 +1,109 @@
 import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
 
-import { ProductVariantRepository } from '@libs/domain/product/repositories/product-variant.repository';
-
 import { OrderRepository } from '../repositories/order.repository';
 import { Order, OrderStatus } from '../entities/order.entity';
+import { ProductVariant } from '@libs/domain/product/entities/product-variant.entity';
 import { OrderProduct } from '../entities/order-product.entity';
+import {
+  CartItemResponse,
+  InventoryResponse,
+  VariantResponse,
+} from '@libs/shared';
+import { InventoryStatus } from '@libs/domain/inventory/entities/inventory.entity';
 
 type CreateOrder = {
   userId: string;
-  quantity: number;
-  itemId: string[];
+  quantity?: number;
+  cartitem?: CartItemResponse[];
+  productVariant?: VariantResponse;
+  inventory: InventoryResponse[];
 };
 
 @Injectable()
 export class OrderService {
-  constructor(
-    private readonly orderRepository: OrderRepository,
-    private readonly productVariantRepository: ProductVariantRepository,
-  ) {}
+  constructor(private readonly orderRepository: OrderRepository) {}
 
-  async createOrder({ itemId, quantity, userId }: CreateOrder): Promise<Order> {
-    const products = await this.productVariantRepository.findMany(itemId);
+  async createOrder({
+    cartitem,
+    productVariant,
+    inventory,
+    quantity,
+    userId,
+  }: CreateOrder): Promise<Order> {
+    if (cartitem && !productVariant) {
+      if (cartitem.length === 0) throw new Error('Item not found');
 
-    const items = products.map((item) =>
-      OrderProduct.createOrderProduct({
+      for (const i of inventory) {
+        if (i.quantity < quantity || i.status !== InventoryStatus.AVAILABLE) {
+          throw new Error('Insuficient stock product');
+        }
+      }
+
+      const items = cartitem.map((value) =>
+        OrderProduct.createOrderProduct({
+          id: randomUUID(),
+          item: ProductVariant.create({
+            id: value.item.id,
+            imageUrl: value.item.imageUrl,
+            label: value.item.label,
+            price: value.item.price,
+            productId: value.item.productId,
+            sku: value.item.sku,
+          }),
+          price: value.item.price,
+          quantity: value.quantity,
+          orderId: randomUUID(),
+        }),
+      );
+
+      const total_amount = items.reduce((sum, item) => {
+        return sum + item.getPrice().getValue() * item.getQuantity().getValue();
+      }, 0);
+
+      const order = Order.createOrder({
         id: randomUUID(),
-        item: item,
-        price: item.getPrice().getValue(),
+        userId,
+        items,
+        total_amount,
+      });
+
+      return await this.orderRepository.save(order);
+    } else if (productVariant && !cartitem) {
+      for (const i of inventory) {
+        if (i.quantity < quantity || i.status !== InventoryStatus.AVAILABLE) {
+          throw new Error('Insuficient stock product');
+        }
+      }
+
+      const { id, imageUrl, label, price, productId, sku } = productVariant;
+
+      const item = OrderProduct.createOrderProduct({
+        id: randomUUID(),
+        item: ProductVariant.create({
+          id,
+          imageUrl,
+          label,
+          price,
+          productId,
+          sku,
+        }),
+        price: price,
         quantity: quantity,
         orderId: randomUUID(),
-      }),
-    );
+      });
 
-    const total_amount = items.reduce((sum, item) => {
-      return sum + item.getPrice().getValue() * item.getQuantity().getValue();
-    }, 0);
+      const total_amount = quantity * price;
 
-    const order = Order.createOrder({
-      id: randomUUID(),
-      userId,
-      items,
-      total_amount,
-    });
+      const result = Order.createOrder({
+        id: randomUUID(),
+        userId,
+        items: [item],
+        total_amount,
+      });
 
-    return await this.orderRepository.save(order);
+      return await this.orderRepository.save(result);
+    }
   }
 
   async getOrder(orderId: string): Promise<Order> {

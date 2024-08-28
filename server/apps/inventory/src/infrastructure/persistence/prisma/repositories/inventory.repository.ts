@@ -44,6 +44,15 @@ export class InventoryRepositoryImpl implements InventoryRepository {
     return InventoryMapper.toDomain(result);
   }
 
+  async getStockProducts(productIds: string[]): Promise<Inventory[]> {
+    const result = await this.service.inventory.findMany({
+      where: { itemId: { in: productIds } },
+      include: { item: true },
+    });
+
+    return result.map((value) => InventoryMapper.toDomain(value));
+  }
+
   async updateStockProduct(data: Inventory): Promise<Inventory> {
     const payload: Prisma.InventoryUpdateInput = InventoryMapper.toPrisma(data);
 

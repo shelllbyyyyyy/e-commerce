@@ -46,6 +46,10 @@ export class InventoryService {
   async getStockProduct(productId: string): Promise<Inventory> {
     return await this.repository.getStockProduct(productId);
   }
+
+  async getStockProducts(productIds: string[]): Promise<Inventory[]> {
+    return await this.repository.getStockProducts(productIds);
+  }
   async updateStockProduct({
     productId,
     quantity,

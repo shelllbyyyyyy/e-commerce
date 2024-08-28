@@ -84,9 +84,15 @@ export class OrderController {
   async handleCreateOrder(@Payload() data: any, @Ctx() context: RmqContext) {
     const rpc = RpcRequestHandler.execute<CreateOrderDTO>(data);
 
-    const { quantity, productId } = rpc.request;
+    const { quantity, cartItemId, productId } = rpc.request;
 
-    const command = new CreateOrderCommand(rpc.user.sub, productId, quantity);
+    const command = new CreateOrderCommand(
+      rpc.user.sub,
+      quantity,
+      rpc.access_token,
+      cartItemId,
+      productId,
+    );
 
     try {
       const result = await this.command.execute<CreateOrderCommand, Order>(
