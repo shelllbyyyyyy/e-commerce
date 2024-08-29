@@ -18,6 +18,7 @@
     "start:prod:root": "node dist/apps/root/main",
     "start:prod:inventory": "node dist/apps/inventory/main",
     "start:prod:cart": "node dist/apps/cart/main",
+    "start:prod:order": "node dist/apps/order/main",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migration": "prisma migrate dev",

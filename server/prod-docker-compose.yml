@@ -41,7 +41,7 @@ services:
       context: .
       dockerfile: ./apps/auth/Dockerfile
       target: production
-    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:auth"
+    command: sh -c "npx prisma db push && npm run start:prod:auth"
     env_file:
       - ./apps/auth/.env
     depends_on:
@@ -60,7 +60,7 @@ services:
       context: .
       dockerfile: ./apps/user/Dockerfile
       target: production
-    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:user"
+    command: sh -c "npx prisma db push && npm run start:prod:user"
     env_file:
       - ./apps/user/.env
     depends_on:
@@ -79,7 +79,7 @@ services:
       context: .
       dockerfile: ./apps/product/Dockerfile
       target: production
-    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:product"
+    command: sh -c "npx prisma db push && npm run start:prod:product"
     env_file:
       - ./apps/product/.env
     depends_on:
@@ -98,7 +98,7 @@ services:
       context: .
       dockerfile: ./apps/inventory/Dockerfile
       target: production
-    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:inventory"
+    command: sh -c "npx prisma db push && npm run start:prod:inventory"
     env_file:
       - ./apps/inventory/.env
     depends_on:
@@ -117,9 +117,28 @@ services:
       context: .
       dockerfile: ./apps/cart/Dockerfile
       target: production
-    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:cart"
+    command: sh -c "npx prisma db push && npm run start:prod:cart"
     env_file:
       - ./apps/cart/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - default
+
+  order:
+    build:
+      context: .
+      dockerfile: ./apps/order/Dockerfile
+      target: production
+    command: sh -c "npx prisma db push && npm run start:prod:order"
+    env_file:
+      - ./apps/order/.env
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -136,7 +155,7 @@ services:
       context: .
       dockerfile: ./apps/root/Dockerfile
       target: production
-    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:prod:root"
+    command: sh -c "npx prisma db push && npm run start:prod:root"
     ports:
       - '5000:5000'
     env_file:
@@ -155,6 +174,8 @@ services:
       inventory:
         condition: service_started
       cart:
+        condition: service_started
+      order:
         condition: service_started
     volumes:
       - .:/usr/src/app

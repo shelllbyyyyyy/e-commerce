@@ -131,6 +131,25 @@ services:
     networks:
       - default
 
+  order:
+    build:
+      context: .
+      dockerfile: ./apps/order/Dockerfile
+      target: development
+    command: sh -c "npx prisma migrate deploy && npm run start:dev order"
+    env_file:
+      - ./apps/order/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - default
+
   gateways:
     build:
       context: .
@@ -156,6 +175,9 @@ services:
         condition: service_started
       cart:
         condition: service_started
+      order:
+        condition: service_started
+
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
