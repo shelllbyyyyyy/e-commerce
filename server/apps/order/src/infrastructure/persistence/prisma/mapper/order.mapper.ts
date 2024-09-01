@@ -5,7 +5,7 @@ import { Order, OrderStatus } from '@libs/domain';
 import { OrderProductMapper } from './order-product.mapper';
 
 const order = Prisma.validator<Prisma.OrderDefaultArgs>()({
-  include: { items: { include: { item: true } } },
+  include: { items: { include: { item: { include: { product: true } } } } },
 });
 
 type Orders = Prisma.OrderGetPayload<typeof order>;

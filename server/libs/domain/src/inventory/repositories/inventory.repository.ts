@@ -9,4 +9,5 @@ export abstract class InventoryRepository {
   abstract getStockProduct(productId: string): Promise<Inventory>;
   abstract getStockProducts(productIds: string[]): Promise<Inventory[]>;
   abstract updateStockProduct(data: Inventory): Promise<Inventory>;
+  abstract updateManyStockProduct(orderId: string): Promise<void>;
 }

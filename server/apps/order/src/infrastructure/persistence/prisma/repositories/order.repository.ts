@@ -11,11 +11,7 @@ export class OrderRepositoryImpl implements OrderRepository {
 
   async findAll(): Promise<Order[]> {
     const result = await this.service.order.findMany({
-      include: {
-        items: {
-          include: { item: true },
-        },
-      },
+      include: { items: { include: { item: { include: { product: true } } } } },
     });
 
     return result.map((value) => OrderMapper.toDomain(value));
@@ -24,7 +20,7 @@ export class OrderRepositoryImpl implements OrderRepository {
   async findByUserId(userId: string): Promise<Order[]> {
     const result = await this.service.order.findMany({
       where: { userId },
-      include: { items: { include: { item: true } } },
+      include: { items: { include: { item: { include: { product: true } } } } },
     });
 
     return result.map((value) => OrderMapper.toDomain(value));
@@ -33,7 +29,7 @@ export class OrderRepositoryImpl implements OrderRepository {
   async findOrder(orderId: string): Promise<Order> {
     const result = await this.service.order.findUnique({
       where: { id: orderId },
-      include: { items: { include: { item: true } } },
+      include: { items: { include: { item: { include: { product: true } } } } },
     });
 
     return OrderMapper.toDomain(result);
@@ -77,7 +73,7 @@ export class OrderRepositoryImpl implements OrderRepository {
           totalAmount: data.getTotalAmount(),
         },
         include: {
-          items: { include: { item: true } },
+          items: { include: { item: { include: { product: true } } } },
         },
       });
 
@@ -96,7 +92,7 @@ export class OrderRepositoryImpl implements OrderRepository {
         status: payload.status,
       },
       include: {
-        items: { include: { item: true } },
+        items: { include: { item: { include: { product: true } } } },
       },
     });
 

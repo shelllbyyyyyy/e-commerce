@@ -10,6 +10,7 @@ export class ProductVariant {
     private readonly imageUrl: string,
     private readonly label: Label,
     private readonly productId: string,
+    private readonly name?: string,
     private readonly createdAt?: Date,
     private readonly updatedAt?: Date,
   ) {
@@ -27,6 +28,10 @@ export class ProductVariant {
 
   getSku(): Sku {
     return this.sku;
+  }
+
+  getName(): string {
+    return this.name;
   }
 
   getPrice(): Price {

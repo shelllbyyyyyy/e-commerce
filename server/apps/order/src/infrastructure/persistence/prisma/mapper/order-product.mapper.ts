@@ -5,7 +5,7 @@ import { OrderProduct, Price, Quantity } from '@libs/domain';
 import { VariantMapper } from './varian.mapper';
 
 const orderProduct = Prisma.validator<Prisma.OrderProductDefaultArgs>()({
-  include: { item: true },
+  include: { item: { include: { product: true } } },
 });
 
 type OrderProducts = Prisma.OrderProductGetPayload<typeof orderProduct>;

@@ -30,6 +30,7 @@ import { GetStockQuery } from '@/inventory/application/queries/inventory/get-sto
 import { UpdateStockCommand } from '@/inventory/application/command/inventory/update-stock.command';
 import { AddStockCommand } from '@/inventory/application/command/inventory/add-stock.command';
 import { GetStocksQuery } from '@/inventory/application/queries/inventory/get-stock-products.query';
+import { DecreaseStockCommand } from '@/inventory/application/command/inventory/decrease-stock.command';
 
 @Controller('inventory')
 @UseFilters(RpcExceptionFilter)
@@ -146,6 +147,25 @@ export class InventoryController {
       const response = InventoryMapper.toJson(result);
 
       return response;
+    } catch (error) {
+      throw new RpcException(new NotFoundException('Stock product not found'));
+    }
+  }
+
+  @MessagePattern('decrease_stock_product')
+  async handleDecreaseStock(@Payload() data: any, @Ctx() context: RmqContext) {
+    const rpc = RpcRequestHandler.execute(data);
+
+    const command = new DecreaseStockCommand(rpc.param);
+
+    try {
+      const result = await this.command.execute<DecreaseStockCommand, any>(
+        command,
+      );
+
+      this.rmqService.ack(context);
+
+      return result;
     } catch (error) {
       throw new RpcException(new NotFoundException('Stock product not found'));
     }

@@ -1,6 +1,12 @@
-import { ProductVariant as Variant } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 import { Label, Price, ProductVariant, Sku } from '@libs/domain';
+
+const variant = Prisma.validator<Prisma.ProductVariantDefaultArgs>()({
+  include: { product: true },
+});
+
+type Variant = Prisma.ProductVariantGetPayload<typeof variant>;
 
 export class VariantMapper {
   static toPrisma(data: ProductVariant): any {
@@ -20,6 +26,7 @@ export class VariantMapper {
       data.imageUrl,
       new Label(data.label),
       data.productId,
+      data.product.name,
     );
   }
 }

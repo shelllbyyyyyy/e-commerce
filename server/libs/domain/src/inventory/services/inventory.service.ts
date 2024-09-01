@@ -50,6 +50,7 @@ export class InventoryService {
   async getStockProducts(productIds: string[]): Promise<Inventory[]> {
     return await this.repository.getStockProducts(productIds);
   }
+
   async updateStockProduct({
     productId,
     quantity,
@@ -59,5 +60,9 @@ export class InventoryService {
 
     const update = inventory.updateStock({ quantity, status });
     return await this.repository.updateStockProduct(update);
+  }
+
+  async updateManyStockProduct(orderId: string): Promise<void> {
+    await this.repository.updateManyStockProduct(orderId);
   }
 }

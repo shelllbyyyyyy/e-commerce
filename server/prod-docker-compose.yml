@@ -150,6 +150,25 @@ services:
     networks:
       - default
 
+  billing:
+    build:
+      context: .
+      dockerfile: ./apps/billing/Dockerfile
+      target: production
+    command: sh -c "npx prisma db push && npm run start:prod:billing"
+    env_file:
+      - ./apps/billing/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - default
+
   gateways:
     build:
       context: .
@@ -176,6 +195,8 @@ services:
       cart:
         condition: service_started
       order:
+        condition: service_started
+      billing:
         condition: service_started
     volumes:
       - .:/usr/src/app

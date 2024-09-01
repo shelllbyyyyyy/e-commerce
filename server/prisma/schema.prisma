@@ -159,6 +159,7 @@ model Order {
   userId               String            @db.Uuid
 
   items                OrderProduct[]
+  billing              Billing?          
 
   @@map("order")
 }
@@ -184,4 +185,39 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+model Billing {
+  id                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  amount              Int
+  payment             PaymentMethod
+  status              BillingStatus
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  orderId             String             @db.Uuid @unique
+  order               Order              @relation(fields: [orderId], references: [id])
+
+  @@map("billing")
+}
+
+enum BillingStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum PaymentMethod {
+  credit_card
+  bank_transfer
+  qris
+  direct_debit
+  cstore
+  gopay
+  shopeepay
+  echannel
+  bca_klikpay
+  bca_klikbca
+  cimb_clicks
+  uob_ezpay
 }

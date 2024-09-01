@@ -89,8 +89,6 @@ export class AuthController {
 
       return token;
     } catch (error) {
-      console.log(error);
-
       throw new RpcException(
         new UnauthorizedException('Check your email/password'),
       );

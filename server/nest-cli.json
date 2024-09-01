@@ -35,23 +35,6 @@
         "watchAssets": true
       }
     },
-    "order": {
-      "type": "application",
-      "root": "apps/order",
-      "entryFile": "main",
-      "sourceRoot": "apps/order/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/order/tsconfig.app.json",
-        "assets": [
-          {
-            "include": "../../../libs/shared/src/mailer/templates/**/*.ejs",
-            "outDir": "dist/apps/order",
-            "watchAssets": true
-          }
-        ],
-        "watchAssets": true
-      }
-    },
     "auth": {
       "type": "application",
       "root": "apps/auth",
@@ -131,6 +114,40 @@
           {
             "include": "../../../libs/shared/src/mailer/templates/**/*.ejs",
             "outDir": "dist/apps/cart",
+            "watchAssets": true
+          }
+        ],
+        "watchAssets": true
+      }
+    },
+    "order": {
+      "type": "application",
+      "root": "apps/order",
+      "entryFile": "main",
+      "sourceRoot": "apps/order/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/order/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "../../../libs/shared/src/mailer/templates/**/*.ejs",
+            "outDir": "dist/apps/order",
+            "watchAssets": true
+          }
+        ],
+        "watchAssets": true
+      }
+    },
+    "billing": {
+      "type": "application",
+      "root": "apps/billing",
+      "entryFile": "main",
+      "sourceRoot": "apps/billing/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/billing/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "../../../libs/shared/src/mailer/templates/**/*.ejs",
+            "outDir": "dist/apps/billing",
             "watchAssets": true
           }
         ],

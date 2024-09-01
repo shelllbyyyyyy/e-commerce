@@ -3,6 +3,10 @@ export * from './cart/entities/cart.entity';
 export * from './cart/repositories/cart.repository';
 export * from './cart/services/cart.service';
 
+export * from './billing/entities/billing';
+export * from './billing/repositories/billing.repository';
+export * from './billing/services/billing.service';
+
 export * from './inventory/entities/inventory.entity';
 export * from './inventory/repositories/inventory.repository';
 export * from './inventory/services/inventory.service';
