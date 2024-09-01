@@ -18,7 +18,7 @@ This project is an e-commerce application built using a microservices architectu
   - [x] Inventory management
   - [x] Cart management
   - [x] Order management
-  - [ ] Billing management
+  - [x] Billing management
 - Frontend :
   - [ ] Initial setup
 
@@ -69,6 +69,7 @@ The application consists of multiple microservices:
 - **PostgreSQL**: Relational database for storing data.
 - **Docker**: Containerization of services for easy deployment and scaling.
 - **Cloudinary**: Storage for store images such as product-images, profile-pictures , etc.
+- **Midtrans**: as Payment gateways.
 
 ## **Getting Started**
 
@@ -116,6 +117,11 @@ REFRESH_TOKEN_SECRET="your-refresh-token-secret"
 JWT_EXPIRATION=3600
 
 VERIFY_TOKEN_SECRET="your-verify-token-secret"
+
+MIDTRANS_MERCHANT_ID="your-midtrans-merchanr-id"
+MIDTRANS_CLIENT_KEY="your-midtrans-client-key"
+MIDTRANS_SERVER_KEY="your-miodtrans-server-key"
+MIDTRANS_MODE="production/sandbox"
 ```
 
 ### **Installation**
