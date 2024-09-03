@@ -1,4 +1,5 @@
-FROM node:alpine AS development
+# stage 1 builder
+FROM node:alpine AS builder
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -9,10 +10,7 @@ WORKDIR /usr/src/app
 
 RUN apk add --no-cache python3 make g++
 
-COPY pnpm-lock.yaml ./
-RUN pnpm fetch
-
-COPY package*.json ./
+COPY package*.json pnpm-lock.yaml ./
 RUN pnpm install
 
 COPY . .
@@ -21,6 +19,7 @@ RUN pnpm prisma generate
 
 RUN pnpm run build cart
 
+# stage 2 production
 FROM node:alpine AS production
 
 ENV PNPM_HOME="/pnpm"
@@ -28,23 +27,15 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-
 WORKDIR /usr/src/app
 
-COPY pnpm-lock.yaml ./
-RUN pnpm fetch
-
-COPY package*.json ./
-RUN pnpm install --prod --frozen-lockfile
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/prisma ./prisma
+COPY --from=builder /usr/src/app/package.json ./package.json
+COPY --from=builder /usr/src/app/pnpm-lock.yaml ./pnpm-lock.yaml
 
 RUN pnpm prune --prod
 
-COPY . .
-
-COPY --from=development /usr/src/app/dist ./dist
-
-RUN pnpm prisma generate
+RUN pnpm add prisma --global
 
 CMD ["node", "dist/apps/cart/main"]

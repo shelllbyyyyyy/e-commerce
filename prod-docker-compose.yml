@@ -38,147 +38,138 @@ services:
 
   auth:
     build:
-      context: .
+      context: ./server
       dockerfile: ./apps/auth/Dockerfile
       target: production
     command: sh -c "npx prisma db push && npm run start:prod:auth"
     env_file:
-      - ./apps/auth/.env
+      - ./server/apps/auth/.env
     depends_on:
       rabbitmq:
         condition: service_healthy
       postgres-primary:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - default
 
   user:
     build:
-      context: .
+      context: ./server
       dockerfile: ./apps/user/Dockerfile
       target: production
-    command: sh -c "npx prisma db push && npm run start:prod:user"
+    command: sh -c "npx prisma generate && npm run start:prod:user"
     env_file:
-      - ./apps/user/.env
+      - ./server/apps/user/.env
     depends_on:
+      auth:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
       postgres-primary:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - default
 
   product:
     build:
-      context: .
+      context: ./server
       dockerfile: ./apps/product/Dockerfile
       target: production
-    command: sh -c "npx prisma db push && npm run start:prod:product"
+    command: sh -c "npx prisma generate && npm run start:prod:product"
     env_file:
-      - ./apps/product/.env
+      - ./server/apps/product/.env
     depends_on:
+      auth:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
       postgres-primary:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - default
 
   inventory:
     build:
-      context: .
+      context: ./server
       dockerfile: ./apps/inventory/Dockerfile
       target: production
-    command: sh -c "npx prisma db push && npm run start:prod:inventory"
+    command: sh -c "npx prisma generate && npm run start:prod:inventory"
     env_file:
-      - ./apps/inventory/.env
+      - ./server/apps/inventory/.env
     depends_on:
+      auth:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
       postgres-primary:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - default
 
   cart:
     build:
-      context: .
+      context: ./server
       dockerfile: ./apps/cart/Dockerfile
       target: production
-    command: sh -c "npx prisma db push && npm run start:prod:cart"
+    command: sh -c "npx prisma generate && npm run start:prod:cart"
     env_file:
-      - ./apps/cart/.env
+      - ./server/apps/cart/.env
     depends_on:
+      auth:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
       postgres-primary:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - default
 
   order:
     build:
-      context: .
+      context: ./server
       dockerfile: ./apps/order/Dockerfile
       target: production
-    command: sh -c "npx prisma db push && npm run start:prod:order"
+    command: sh -c "npx prisma generate && npm run start:prod:order"
     env_file:
-      - ./apps/order/.env
+      - ./server/apps/order/.env
     depends_on:
+      auth:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
       postgres-primary:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - default
 
   billing:
     build:
-      context: .
+      context: ./server
       dockerfile: ./apps/billing/Dockerfile
       target: production
-    command: sh -c "npx prisma db push && npm run start:prod:billing"
+    command: sh -c "npx prisma generate && npm run start:prod:billing"
     env_file:
-      - ./apps/billing/.env
+      - ./server/apps/billing/.env
     depends_on:
+      auth:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
       postgres-primary:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - default
 
   gateways:
     build:
-      context: .
+      context: ./server
       dockerfile: ./apps/root/Dockerfile
       target: production
-    command: sh -c "npx prisma db push && npm run start:prod:root"
+    command: sh -c "npx prisma generate && npm run start:prod:root"
     ports:
       - "5000:5000"
     env_file:
-      - ./apps/root/.env
+      - ./server/apps/root/.env
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -198,16 +189,13 @@ services:
         condition: service_started
       billing:
         condition: service_started
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - default
 
   nextjs:
     build:
-      context: .
-      dockerfile: ./web/Dockerfile
+      context: ./web
+      dockerfile: ./Dockerfile
       target: production
     command: npm run start
     env_file:
@@ -221,9 +209,6 @@ services:
         condition: service_healthy
     ports:
       - "8001:8001"
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - default
 

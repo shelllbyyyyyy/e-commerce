@@ -38,9 +38,8 @@ services:
 
   auth:
     build:
-      context: .
-      dockerfile: ./server/apps/auth/Dockerfile
-      target: development
+      context: ./server
+      dockerfile: ./apps/auth/dev.Dockerfile
     command: sh -c "npx prisma migrate deploy && npm run start:dev auth"
     env_file:
       - ./server/apps/auth/.env
@@ -57,9 +56,8 @@ services:
 
   user:
     build:
-      context: .
-      dockerfile: ./server/apps/user/Dockerfile
-      target: development
+      context: ./server
+      dockerfile: ./apps/user/dev.Dockerfile
     command: sh -c "npx prisma migrate deploy && npm run start:dev user"
     env_file:
       - ./server/apps/user/.env
@@ -76,9 +74,8 @@ services:
 
   product:
     build:
-      context: .
-      dockerfile: ./server/apps/product/Dockerfile
-      target: development
+      context: ./server
+      dockerfile: ./apps/product/dev.Dockerfile
     command: sh -c "npx prisma migrate deploy && npm run start:dev product"
     env_file:
       - ./server/apps/product/.env
@@ -95,9 +92,8 @@ services:
 
   inventory:
     build:
-      context: .
-      dockerfile: ./server/apps/inventory/Dockerfile
-      target: development
+      context: ./server
+      dockerfile: ./apps/inventory/dev.Dockerfile
     command: sh -c "npx prisma migrate deploy && npm run start:dev inventory"
     env_file:
       - ./server/apps/inventory/.env
@@ -114,9 +110,8 @@ services:
 
   cart:
     build:
-      context: .
-      dockerfile: ./server/apps/cart/Dockerfile
-      target: development
+      context: ./server
+      dockerfile: ./apps/cart/dev.Dockerfile
     command: sh -c "npx prisma migrate deploy && npm run start:dev cart"
     env_file:
       - ./server/apps/cart/.env
@@ -133,9 +128,8 @@ services:
 
   order:
     build:
-      context: .
-      dockerfile: ./server/apps/order/Dockerfile
-      target: development
+      context: ./server
+      dockerfile: ./apps/order/dev.Dockerfile
     command: sh -c "npx prisma migrate deploy && npm run start:dev order"
     env_file:
       - ./server/apps/order/.env
@@ -152,9 +146,8 @@ services:
 
   billing:
     build:
-      context: .
-      dockerfile: ./server/apps/billing/Dockerfile
-      target: development
+      context: ./server
+      dockerfile: ./apps/billing/dev.Dockerfile
     command: sh -c "npx prisma migrate deploy && npm run start:dev billing"
     env_file:
       - ./server/apps/billing/.env
@@ -171,9 +164,8 @@ services:
 
   gateways:
     build:
-      context: .
-      dockerfile: ./server/apps/root/Dockerfile
-      target: development
+      context: ./server
+      dockerfile: ./apps/root/dev.Dockerfile
     command: sh -c "npx prisma migrate deploy && npm run start:dev root"
     ports:
       - "5000:5000"
@@ -207,10 +199,8 @@ services:
 
   nextjs:
     build:
-      context: .
-      dockerfile: ./web/Dockerfile
-      target: development
-    command: npm run dev
+      context: ./web
+      dockerfile: ./dev.Dockerfile
     env_file:
       - ./web/.env.development
     depends_on:
