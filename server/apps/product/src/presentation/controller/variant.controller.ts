@@ -61,7 +61,7 @@ export class VariantController {
       label,
       quantity,
       file,
-      rpc.access_token,
+      rpc.authorization,
     );
 
     try {

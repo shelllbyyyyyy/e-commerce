@@ -14,7 +14,7 @@ export class OrderService {
         this.rmqClient
           .send('get_order_payment', {
             param,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

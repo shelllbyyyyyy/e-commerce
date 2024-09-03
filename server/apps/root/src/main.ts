@@ -27,13 +27,14 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors({
     origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
   app.use(cookieParser());
 
   SwaggerModule.setup('api/docs', app, document);
   await app.init();
-  await app.listen(configService.get('PORT'), '0.0.0.0');
+  await app.listen(configService.get('PORT'));
 }
 
 bootstrap();

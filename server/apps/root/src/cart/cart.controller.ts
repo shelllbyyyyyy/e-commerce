@@ -40,7 +40,7 @@ export class CartController {
     description: "You don't have a cart",
   })
   async getCart(@Req() req: Request, @Res() res: Response) {
-    const access_token = req.cookies?.access_token;
+    const access_token = req.headers.authorization;
 
     const result = await this.cartService.getCart(access_token);
 
@@ -64,7 +64,7 @@ export class CartController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const access_token = req.cookies?.access_token;
+    const access_token = req.headers.authorization;
 
     await this.cartService.addToCart(dto, access_token);
 
@@ -94,7 +94,7 @@ export class CartController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const access_token = req.cookies?.access_token;
+    const access_token = req.headers.authorization;
 
     await this.cartService.updateCartItem(cartItemId, dto, access_token);
 
@@ -117,7 +117,7 @@ export class CartController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const access_token = req.cookies?.access_token;
+    const access_token = req.headers.authorization;
 
     await this.cartService.deleteCartItem(cartItemId, access_token);
 

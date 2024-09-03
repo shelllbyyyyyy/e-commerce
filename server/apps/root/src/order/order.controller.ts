@@ -39,7 +39,7 @@ export class OrderController {
     description: 'Somthing wrong',
   })
   async getOrder(@Req() req: Request, @Res() res: Response) {
-    const result = await this.orderService.getOrder(req.cookies.access_token);
+    const result = await this.orderService.getOrder(req.headers.authorization);
 
     res
       .status(HttpStatus.OK)
@@ -65,7 +65,7 @@ export class OrderController {
   ) {
     const result = await this.orderService.getOrderById(
       orderId,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -92,7 +92,7 @@ export class OrderController {
   ) {
     const result = await this.orderService.createOrder(
       dto,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -130,7 +130,7 @@ export class OrderController {
     const result = await this.orderService.updateOrder(
       orderId,
       dto,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res

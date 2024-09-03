@@ -23,7 +23,7 @@ export class OrderService {
         this.rmqClient
           .send('create_order', {
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -43,7 +43,7 @@ export class OrderService {
         this.rmqClient
           .send('charge', {
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -62,7 +62,7 @@ export class OrderService {
       const result = await lastValueFrom(
         this.rmqClient
           .send('get_order', {
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -82,7 +82,7 @@ export class OrderService {
         this.rmqClient
           .send('get_order_by_id', {
             param,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -107,7 +107,7 @@ export class OrderService {
           .send('update_order', {
             param,
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

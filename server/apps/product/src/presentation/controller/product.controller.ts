@@ -44,7 +44,6 @@ export class ProductController {
     private readonly query: QueryBus,
     private readonly rmqService: RmqService,
     private readonly bufferService: ConvertBufferService,
-    private readonly inventoryService: InventoryService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -77,7 +76,7 @@ export class ProductController {
       label,
       quantity,
       file,
-      rpc.access_token,
+      rpc.authorization,
     );
 
     try {

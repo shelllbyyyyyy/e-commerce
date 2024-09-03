@@ -18,7 +18,7 @@ export class BillingService {
         this.rmqService
           .send('charge', {
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

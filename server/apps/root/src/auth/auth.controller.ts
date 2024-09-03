@@ -69,19 +69,27 @@ export class AuthController {
 
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
+      sameSite: 'strict',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 360000,
     });
 
     res.cookie('refresh_token', result.refresh_token, {
       httpOnly: true,
+      sameSite: 'strict',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res
       .status(HttpStatus.OK)
-      .json(new ApiResponse(HttpStatus.OK, 'Login Successfully', '🔥🔥🔥🔥🔥'));
+      .json(
+        new ApiResponse(
+          HttpStatus.OK,
+          'Login Successfully',
+          result.access_token,
+        ),
+      );
   }
 
   @Post('refresh')

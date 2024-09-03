@@ -20,7 +20,7 @@ export class AddressService {
         this.rmqClient
           .send('add_address', {
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -45,7 +45,7 @@ export class AddressService {
           .send('update_address', {
             param,
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -65,7 +65,7 @@ export class AddressService {
         this.rmqClient
           .send('delete_address', {
             param,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -79,12 +79,12 @@ export class AddressService {
     }
   }
 
-  async getAddressByUserId(access_token: string): Promise<Address[]> {
+  async getAddressByUserId(authentication: string): Promise<Address[]> {
     try {
       const result = await lastValueFrom(
         this.rmqClient
           .send<Address[]>('get_address_by_user', {
-            access_token: access_token,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -104,7 +104,7 @@ export class AddressService {
         this.rmqClient
           .send('get_address', {
             param,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

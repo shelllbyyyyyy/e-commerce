@@ -7,11 +7,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: any) => {
-          return request?.access_token;
-        },
-      ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
       secretOrKey: configService.get('ACCESS_TOKEN_SECRET'),
     });
   }

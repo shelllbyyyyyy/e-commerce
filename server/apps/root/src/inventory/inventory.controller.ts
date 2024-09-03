@@ -36,7 +36,7 @@ export class InventoryController {
   })
   async getAllStockProduct(@Req() req: Request, @Res() res: Response) {
     const result = await this.service.getAllStockProduct(
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -63,7 +63,7 @@ export class InventoryController {
   ) {
     const result = await this.service.getStockProduct(
       productId,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -92,7 +92,7 @@ export class InventoryController {
     const result = await this.service.updateStockProduct(
       productId,
       dto,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res

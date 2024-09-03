@@ -17,7 +17,7 @@ export class InventoryService {
       const result = await lastValueFrom(
         this.rmqService
           .send('get_all_stock_product', {
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -38,7 +38,7 @@ export class InventoryService {
         this.rmqService
           .send('get_stock_product', {
             param,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -64,7 +64,7 @@ export class InventoryService {
           .send('update_stock_product', {
             param,
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

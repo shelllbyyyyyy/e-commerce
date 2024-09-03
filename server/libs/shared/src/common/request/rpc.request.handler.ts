@@ -12,7 +12,7 @@ export class RpcRequest<T = any> {
     public readonly request?: T,
     public readonly param?: string,
     public readonly imageFile?: Payload,
-    public readonly access_token?: string,
+    public readonly authorization?: string,
     public readonly user?: User,
   ) {}
 }
@@ -20,7 +20,7 @@ export class RpcRequest<T = any> {
 @Injectable()
 export class RpcRequestHandler {
   static execute<T>(data: any): RpcRequest<T> {
-    const { request, param, user, imageFile, access_token } = data || {};
-    return new RpcRequest<T>(request, param, imageFile, access_token, user);
+    const { request, param, user, imageFile, authorization } = data || {};
+    return new RpcRequest<T>(request, param, imageFile, authorization, user);
   }
 }

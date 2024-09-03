@@ -22,7 +22,7 @@ export class InventoryService {
           .send('add_to_inventory', {
             param,
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

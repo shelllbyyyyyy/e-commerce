@@ -74,7 +74,7 @@ export class ProductController {
     const result = await this.productService.addProduct(
       dto,
       payload,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -123,7 +123,7 @@ export class ProductController {
     const result = await this.productService.updateProductBySlug(
       slug,
       dto,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -189,7 +189,7 @@ export class ProductController {
   ) {
     const result = await this.productService.deleteProductBySlug(
       slug,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -234,7 +234,7 @@ export class ProductController {
       slug,
       dto,
       payload,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -297,7 +297,7 @@ export class ProductController {
       id,
       dto,
       payload,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -321,7 +321,7 @@ export class ProductController {
   ) {
     const result = await this.productService.deleteProductVariantById(
       id,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res

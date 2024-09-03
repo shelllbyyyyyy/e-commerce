@@ -17,7 +17,7 @@ export class CartService {
         this.rmqService
           .send('add_to_cart', {
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -37,7 +37,7 @@ export class CartService {
       const result = await lastValueFrom(
         this.rmqService
           .send('get_cart', {
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -63,7 +63,7 @@ export class CartService {
           .send('update_cart_item', {
             param,
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -83,7 +83,7 @@ export class CartService {
         this.rmqService
           .send('delete_cart_item', {
             param,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

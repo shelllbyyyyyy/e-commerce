@@ -48,7 +48,7 @@ export class PaymentController {
   ) {
     const result = await this.paymentService.payOrder(
       dto,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res

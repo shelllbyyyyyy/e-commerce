@@ -18,7 +18,7 @@ export class UserService {
         this.rmqClient
           .send('get_user_by_id', {
             param,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -37,7 +37,7 @@ export class UserService {
       const result = await lastValueFrom(
         this.rmqClient
           .send<User>('get_user', {
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -62,7 +62,7 @@ export class UserService {
           .send('update_user', {
             request,
             imageFile,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -82,7 +82,7 @@ export class UserService {
         this.rmqClient
           .send('delete_user', {
             param,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -105,7 +105,7 @@ export class UserService {
         this.rmqClient
           .send('add_address', {
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -130,7 +130,7 @@ export class UserService {
           .send('update_address', {
             param,
             request,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -150,7 +150,7 @@ export class UserService {
         this.rmqClient
           .send('delete_address', {
             param,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -189,7 +189,7 @@ export class UserService {
         this.rmqClient
           .send('get_address', {
             param,
-            access_token: authentication,
+            authorization: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

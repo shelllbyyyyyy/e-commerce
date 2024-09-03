@@ -37,7 +37,7 @@ export class BillingController {
 
     const charge = rpc.request;
 
-    const command = new ChargeCommand(charge, rpc.access_token, rpc.user.sub);
+    const command = new ChargeCommand(charge, rpc.authorization, rpc.user.sub);
 
     try {
       const result = await this.command.execute<ChargeCommand, any>(command);

@@ -49,7 +49,7 @@ export class AddressController {
   ) {
     const address = await this.addressService.getAddress(
       id,
-      req.cookies?.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -71,7 +71,7 @@ export class AddressController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const address = await this.addressService.getAddressByUserId(
-      req.cookies?.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -96,7 +96,7 @@ export class AddressController {
   ) {
     const address = await this.addressService.addAddress(
       dto,
-      req.cookies?.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -130,7 +130,7 @@ export class AddressController {
     const address = await this.addressService.updateAddress(
       id,
       dto,
-      req.cookies?.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -157,7 +157,7 @@ export class AddressController {
   ) {
     const deleted = await this.addressService.deleteAddress(
       id,
-      req.cookies?.access_token,
+      req.headers.authorization,
     );
 
     res

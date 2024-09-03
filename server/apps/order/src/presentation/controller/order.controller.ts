@@ -95,7 +95,7 @@ export class OrderController {
     const command = new CreateOrderCommand(
       rpc.user.sub,
       quantity,
-      rpc.access_token,
+      rpc.authorization,
       cartItemId,
       productId,
     );
@@ -146,7 +146,7 @@ export class OrderController {
   async handleCharge(@Payload() data: any, @Ctx() context: RmqContext) {
     const rpc = RpcRequestHandler.execute<ChargeDTO>(data);
 
-    const command = new ChargeCommand(rpc.request, rpc.access_token);
+    const command = new ChargeCommand(rpc.request, rpc.authorization);
 
     try {
       const result = await this.command.execute<ChargeCommand, any>(command);

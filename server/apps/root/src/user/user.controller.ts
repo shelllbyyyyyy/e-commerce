@@ -52,7 +52,7 @@ export class UserController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = await this.userService.getUser(req.cookies.access_token);
+    const user = await this.userService.getUser(req.headers.authorization);
 
     res
       .status(HttpStatus.OK)
@@ -76,7 +76,7 @@ export class UserController {
   ) {
     const user = await this.userService.getUserById(
       id,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -112,7 +112,7 @@ export class UserController {
     const update = await this.userService.updateUser(
       dto,
       payload,
-      req.cookies.access_token,
+      req.headers.authorization,
     );
 
     res
@@ -135,7 +135,7 @@ export class UserController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    await this.userService.deleteUser(id, req.cookies.access_token);
+    await this.userService.deleteUser(id, req.headers.authorization);
 
     res.status(HttpStatus.NO_CONTENT);
   }
