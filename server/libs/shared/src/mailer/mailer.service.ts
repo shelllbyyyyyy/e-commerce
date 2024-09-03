@@ -13,7 +13,7 @@ export class EmailService {
   ) {}
 
   async sendUserWelcome(user: any, token: string) {
-    const confirmation_url = `${this.configService.get('BASE_URL')}/auth/verify-user/${token}`;
+    const confirmation_url = `${this.configService.get('CLIENT_URL')}/auth/activate-account/${user.email}/${token}`;
 
     await this.mailerService.sendMail({
       to: user.email,
@@ -28,7 +28,7 @@ export class EmailService {
   }
 
   async resendVerificationUser(user: any, token: string) {
-    const confirmation_url = `${this.configService.get('BASE_URL')}/auth/verify-user/${token}`;
+    const confirmation_url = `${this.configService.get('CLIENT_URL')}/auth/resend-verification/${token}`;
 
     await this.mailerService.sendMail({
       to: user.email,

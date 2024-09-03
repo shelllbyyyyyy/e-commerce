@@ -16,6 +16,8 @@ import { EmailService } from './mailer.service';
         MAIL_HOST: Joi.string().required(),
         SMTP_USERNAME: Joi.string().required(),
         SMTP_PASSWORD: Joi.string().required(),
+        CLIENT_URL: Joi.string().required(),
+        BASE_URL: Joi.string().required(),
       }),
       envFilePath: './.env',
     }),
