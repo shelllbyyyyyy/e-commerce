@@ -20,7 +20,7 @@ This project is an e-commerce application built using a microservices architectu
   - [x] Order management
   - [x] Billing management
 - Frontend :
-  - [ ] Initial setup
+  - [x] Initial setup
 
 ## **Table of Contents**
 
@@ -87,7 +87,7 @@ Configure your environment variables in the `.env` files located in the root and
 
 ```dotenv
 # Root .env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/e-commerce?schema=public"
+DATABASE_URL="postgresql://postgres:password@postgres-primary:5432/e-commerce?schema=public"
 
 BASE_URL="http://localhost:4000"
 

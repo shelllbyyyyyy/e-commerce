@@ -3,10 +3,10 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - "5672:5672"
+      - "15672:15672"
     healthcheck:
-      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -20,7 +20,7 @@ services:
     image: postgres:13
     container_name: postgres-primary
     ports:
-      - '5432:5432'
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -28,7 +28,7 @@ services:
     volumes:
       - data_postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -40,8 +40,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/auth/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev auth"
+      target: production
+    command: sh -c "npx prisma db push && npm run start:prod:auth"
     env_file:
       - ./apps/auth/.env
     depends_on:
@@ -59,8 +59,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/user/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev user"
+      target: production
+    command: sh -c "npx prisma db push && npm run start:prod:user"
     env_file:
       - ./apps/user/.env
     depends_on:
@@ -78,8 +78,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/product/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev product"
+      target: production
+    command: sh -c "npx prisma db push && npm run start:prod:product"
     env_file:
       - ./apps/product/.env
     depends_on:
@@ -97,8 +97,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/inventory/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev inventory"
+      target: production
+    command: sh -c "npx prisma db push && npm run start:prod:inventory"
     env_file:
       - ./apps/inventory/.env
     depends_on:
@@ -116,8 +116,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/cart/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev cart"
+      target: production
+    command: sh -c "npx prisma db push && npm run start:prod:cart"
     env_file:
       - ./apps/cart/.env
     depends_on:
@@ -135,8 +135,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/order/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev order"
+      target: production
+    command: sh -c "npx prisma db push && npm run start:prod:order"
     env_file:
       - ./apps/order/.env
     depends_on:
@@ -154,8 +154,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/billing/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev billing"
+      target: production
+    command: sh -c "npx prisma db push && npm run start:prod:billing"
     env_file:
       - ./apps/billing/.env
     depends_on:
@@ -173,10 +173,10 @@ services:
     build:
       context: .
       dockerfile: ./apps/root/Dockerfile
-      target: development
-    command: sh -c "npx prisma migrate deploy && npm run start:dev root"
+      target: production
+    command: sh -c "npx prisma db push && npm run start:prod:root"
     ports:
-      - '5000:5000'
+      - "5000:5000"
     env_file:
       - ./apps/root/.env
     depends_on:
@@ -198,7 +198,29 @@ services:
         condition: service_started
       billing:
         condition: service_started
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - default
 
+  nextjs:
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile
+      target: production
+    command: npm run start
+    env_file:
+      - ./web/.env.production
+    depends_on:
+      gateways:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      postgres-primary:
+        condition: service_healthy
+    ports:
+      - "8001:8001"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
