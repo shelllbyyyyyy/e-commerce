@@ -28,12 +28,11 @@ WORKDIR /usr/src/app
 
 RUN apk add --no-cache python3 make g++
 
-COPY --from=builder /usr/src/app/.next ./.next
+COPY --from=builder /usr/src/app/.next/standalone ./
+COPY --from=builder /usr/src/app/.next/static ./.next/static
 COPY --from=builder /usr/src/app/public ./public
 COPY --from=builder /usr/src/app/next.config.mjs ./next.config.mjs
 COPY --from=builder /usr/src/app/package.json ./package.json
 COPY --from=builder /usr/src/app/pnpm-lock.yaml ./pnpm-lock.yaml
 
-RUN pnpm prune --prod
-
-CMD ["pnpm", "start"]
+CMD ["node", "server.js"]

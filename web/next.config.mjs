@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       {
@@ -7,6 +8,7 @@ const nextConfig = {
         hostname: "res.cloudinary.com",
       },
       {
+        protocol: "http",
         hostname: "localhost",
       },
     ],

@@ -197,7 +197,7 @@ services:
       context: ./web
       dockerfile: ./Dockerfile
       target: production
-    command: npm run start
+    command: npm run start:standalone
     env_file:
       - ./web/.env.production
     depends_on:
