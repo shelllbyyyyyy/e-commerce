@@ -13,7 +13,7 @@ export class UserService {
       const result = await lastValueFrom(
         this.rmqClient
           .send('get_user', {
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

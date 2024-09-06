@@ -62,7 +62,7 @@ export class OrderService {
       const result = await lastValueFrom(
         this.rmqClient
           .send('get_order', {
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

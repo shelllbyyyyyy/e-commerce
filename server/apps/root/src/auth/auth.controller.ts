@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Param,
   Patch,
@@ -8,6 +9,7 @@ import {
   Req,
   Res,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -25,11 +27,17 @@ import { RegisterDTO } from './dtos/register.dto';
 import { ApiResponse } from './dtos/api-response.dto';
 import { LoginDTO } from './dtos/login.dto';
 import { AuthService } from './auth.service';
+import { ConfigService } from '@nestjs/config';
+import { GoogleOauthGuard } from './guard/google-auth.guard';
+import { AuthenticatedUser } from '@libs/shared';
 
 @Controller('auth')
 @ApiTags('Authentication')
 export class AuthController {
-  constructor(private readonly service: AuthService) {}
+  constructor(
+    private readonly service: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('register')
   @ApiBody({ type: RegisterDTO })
@@ -69,56 +77,21 @@ export class AuthController {
 
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 360000,
+      path: '/',
     });
 
     res.cookie('refresh_token', result.refresh_token, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
     });
 
-    res
-      .status(HttpStatus.OK)
-      .json(
-        new ApiResponse(
-          HttpStatus.OK,
-          'Login Successfully',
-          result.access_token,
-        ),
-      );
-  }
-
-  @Post('refresh')
-  @ApiNoContentResponse({
-    status: HttpStatus.OK,
-    description: 'Access token generated',
-  })
-  @ApiUnauthorizedResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'No refresh token provided',
-  })
-  async refresh(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies['refresh_token'];
-
-    const data = await this.service.refresh(refreshToken);
-
-    res.cookie('access_token', data.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 3600000,
-    });
-
-    res.json(
-      new ApiResponse(
-        HttpStatus.OK,
-        'Access token generated successfully',
-        '🔥🔥🔥🔥',
-      ),
-    );
+    res.status(HttpStatus.OK).send({ message: 'Login Successfully' });
   }
 
   @Post('logout')
@@ -130,7 +103,7 @@ export class AuthController {
     res.cookie('access_token', '');
     res.cookie('refresh_token', '');
 
-    res.json(new ApiResponse(HttpStatus.OK, 'Logout success', '🔥🔥🔥🔥'));
+    res.status(HttpStatus.OK).send({ message: 'Logout success' });
   }
 
   @Patch('verify-user/:token')
@@ -178,5 +151,37 @@ export class AuthController {
           verify,
         ),
       );
+  }
+
+  @Get('google')
+  @UseGuards(GoogleOauthGuard)
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Google auth succesfull',
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Something error',
+  })
+  async googleAuth() {}
+
+  @Get('google/callback')
+  @UseGuards(GoogleOauthGuard)
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'Google auth succesfull',
+  })
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Something error',
+  })
+  async callback(@Req() req: Request, @Res() res: Response) {
+    const user = req.user as AuthenticatedUser;
+
+    const result = await this.service.googleLogin(user);
+
+    res.redirect(
+      `${this.configService.get<string>('CLIENT_URL')}/api/auth/google/callback?access_token=${result.access_token}`,
+    );
   }
 }

@@ -74,7 +74,7 @@ export class ProductController {
     const result = await this.productService.addProduct(
       dto,
       payload,
-      req.headers.authorization,
+      req.cookies.access_token,
     );
 
     res
@@ -97,7 +97,10 @@ export class ProductController {
     status: HttpStatus.NOT_FOUND,
     description: 'Somthing wrong',
   })
-  async getAllProduct(@Req() req: Request, @Res() res: Response) {
+  async getAllProduct(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const result = await this.productService.getAllProduct();
 
     res
@@ -123,7 +126,7 @@ export class ProductController {
     const result = await this.productService.updateProductBySlug(
       slug,
       dto,
-      req.headers.authorization,
+      req.cookies.access_token,
     );
 
     res
@@ -189,7 +192,7 @@ export class ProductController {
   ) {
     const result = await this.productService.deleteProductBySlug(
       slug,
-      req.headers.authorization,
+      req.cookies.access_token,
     );
 
     res
@@ -234,7 +237,7 @@ export class ProductController {
       slug,
       dto,
       payload,
-      req.headers.authorization,
+      req.cookies.access_token,
     );
 
     res
@@ -297,7 +300,7 @@ export class ProductController {
       id,
       dto,
       payload,
-      req.headers.authorization,
+      req.cookies.access_token,
     );
 
     res
@@ -321,7 +324,7 @@ export class ProductController {
   ) {
     const result = await this.productService.deleteProductVariantById(
       id,
-      req.headers.authorization,
+      req.cookies.access_token,
     );
 
     res

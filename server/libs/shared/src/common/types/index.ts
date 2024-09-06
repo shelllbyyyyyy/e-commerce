@@ -86,3 +86,25 @@ export type OrderProductResponse = {
   quantity: number;
   price: number;
 };
+
+// src/auth/auth.types.ts
+
+export type GoogleProfile = {
+  id: string;
+  displayName: string;
+  name: {
+    familyName: string;
+    givenName: string;
+  };
+  emails: { value: string }[];
+  photos: { value: string }[];
+};
+
+export type AuthenticatedUser = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  picture: string;
+  accessToken: string;
+  refreshToken: string;
+};

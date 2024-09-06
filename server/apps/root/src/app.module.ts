@@ -8,9 +8,11 @@ import { ProductModule } from './product/product.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
+import { RefreshModule } from './midleware/midleware.module';
 
 @Module({
   imports: [
+    RefreshModule,
     AuthModule,
     UserModule,
     SwaggerModule,

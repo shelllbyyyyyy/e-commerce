@@ -26,8 +26,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: ['http://localhost:3000', 'https://shop.mangaip.online'],
     credentials: true,
   });
   app.use(cookieParser());

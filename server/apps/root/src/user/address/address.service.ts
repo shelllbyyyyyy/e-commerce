@@ -84,7 +84,7 @@ export class AddressService {
       const result = await lastValueFrom(
         this.rmqClient
           .send<Address[]>('get_address_by_user', {
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

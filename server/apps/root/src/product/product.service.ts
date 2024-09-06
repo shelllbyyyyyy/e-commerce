@@ -26,7 +26,7 @@ export class ProductService {
           .send('add_product', {
             request,
             imageFile,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -102,7 +102,7 @@ export class ProductService {
           .send('update_product_by_slug', {
             param,
             request,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -125,7 +125,7 @@ export class ProductService {
         this.rmqClient
           .send('delete_product_by_slug', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -152,7 +152,7 @@ export class ProductService {
             param,
             request,
             imageFile,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -196,7 +196,7 @@ export class ProductService {
             param,
             request,
             imageFile,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -219,7 +219,7 @@ export class ProductService {
         this.rmqClient
           .send('delete_product_variant_by_id', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

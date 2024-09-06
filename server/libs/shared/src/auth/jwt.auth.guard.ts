@@ -17,26 +17,30 @@ export class JwtAuthGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const token = this.getAuthentication(context);
-    return this.authClient.send('validate_user', token).pipe(
-      tap((res) => {
-        this.addUser(res, context);
-      }),
-      catchError(() => {
-        throw new RpcException(
-          new UnauthorizedException('To access this you have to login first'),
-        );
-      }),
-    );
+    return this.authClient
+      .send('validate_user', {
+        access_token: token,
+      })
+      .pipe(
+        tap((res) => {
+          this.addUser(res, context);
+        }),
+        catchError(() => {
+          throw new RpcException(
+            new UnauthorizedException('To access this you have to login first'),
+          );
+        }),
+      );
   }
 
   private getAuthentication(context: ExecutionContext) {
     let authentication: string;
     if (context.getType() === 'rpc') {
-      authentication = context.switchToRpc().getData();
+      authentication = context.switchToRpc().getData().access_token;
     } else if (context.getType() === 'http') {
-      authentication = context.switchToHttp().getRequest();
+      authentication = context.switchToHttp().getRequest()
+        .cookies?.access_token;
     }
-
     if (!authentication) {
       throw new RpcException(
         new UnauthorizedException('To access this you have to login first'),

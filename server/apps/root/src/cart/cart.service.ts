@@ -37,7 +37,7 @@ export class CartService {
       const result = await lastValueFrom(
         this.rmqService
           .send('get_cart', {
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
