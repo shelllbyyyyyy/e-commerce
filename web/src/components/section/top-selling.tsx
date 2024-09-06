@@ -1,19 +1,19 @@
 import React from "react";
-import { notFound } from "next/navigation";
 
-import { Product } from "@/shared/common/interface/product";
+import { ApiResponse, Product } from "@/shared/common/interface";
+
 import Wrapper from "../providers/wrapper";
 import { ProductCard } from "../cards/product-card";
 import { Button } from "../ui/button";
 
-const getProducts = async () => {
+const getProducts = async (): Promise<ApiResponse<Product[]>> => {
   const baseUrl = process.env.BASE_API_URL;
+
   const res = await fetch(`${baseUrl}/product`, {
     cache: "no-store",
   });
 
-  const result = await res.json();
-  if (!result) notFound();
+  const result: ApiResponse<Product[]> = await res.json();
 
   return result;
 };
@@ -26,7 +26,7 @@ export const TopSelling = async () => {
       <Wrapper className="flex flex-col justify-center items-center gap-14">
         <h2 className="uppercase">Top Selling</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-          {data.map((product: Product) => {
+          {data?.map((product: Product) => {
             return (
               <ProductCard
                 key={product.id}

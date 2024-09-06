@@ -6,7 +6,6 @@ import { RmqModule, AUTH_SERVICE } from '@libs/shared';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from '@/auth/common/strategies/jwt.strategy';
 import { GoogleOauthGuard } from './guard/google-auth.guard';
 import { GoogleStrategy } from './strategies/google.startegy';
 
@@ -25,6 +24,6 @@ import { GoogleStrategy } from './strategies/google.startegy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, GoogleOauthGuard, GoogleStrategy],
+  providers: [AuthService, GoogleOauthGuard, GoogleStrategy],
 })
 export class AuthModule {}

@@ -6,6 +6,8 @@ import {
   Param,
   Patch,
   Post,
+  Query,
+  Redirect,
   Req,
   Res,
   UseFilters,
@@ -178,10 +180,10 @@ export class AuthController {
   async callback(@Req() req: Request, @Res() res: Response) {
     const user = req.user as AuthenticatedUser;
 
-    const result = await this.service.googleLogin(user);
+    await this.service.googleLogin(user);
 
-    res.redirect(
-      `${this.configService.get<string>('CLIENT_URL')}/api/auth/google/callback?access_token=${result.access_token}`,
-    );
+    const url = `${this.configService.get<string>('CLIENT_URL')}/api/auth/google/callback`;
+
+    res.redirect(301, url.toString());
   }
 }
