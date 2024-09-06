@@ -33,6 +33,7 @@ import { DeleteUserCommand } from '@/user/application/command/user/delete-user.c
 import { GetUserByEmailQuery } from '@/user/application/queries/user/get-user-by-email.query';
 import { VerifyUserCommand } from '@/user/application/command/user/verify-user.command';
 import { CreateUserCommand } from '@/user/application/command/user/create-user.command';
+import { NewUserCommand } from '@/user/application/command/user/new-user.command';
 
 @Controller('user')
 @UseFilters(new RpcExceptionFilter())
@@ -139,6 +140,7 @@ export class UserController {
     @Ctx() context: RmqContext,
   ): Promise<User | null> {
     const rpc = RpcRequestHandler.execute(data);
+
     const query = new GetUserByEmailQuery(rpc.param);
 
     try {
@@ -182,6 +184,43 @@ export class UserController {
 
     try {
       const result = await this.commandBus.execute<CreateUserCommand, User>(
+        command,
+      );
+
+      this.rmqService.ack(context);
+
+      return result;
+    } catch (error) {
+      throw new RpcException(new BadRequestException('Create user failed'));
+    }
+  }
+
+  @MessagePattern('new_user')
+  async handleNewUser(@Payload() data: any, @Ctx() context: RmqContext) {
+    const rpc = RpcRequestHandler.execute<any>(data);
+
+    const {
+      email,
+      password,
+      username,
+      id,
+      display_name,
+      profile_picture,
+      isVerified,
+    } = rpc.request;
+
+    const command = new NewUserCommand(
+      id,
+      email,
+      password,
+      username,
+      isVerified,
+      display_name,
+      profile_picture,
+    );
+
+    try {
+      const result = await this.commandBus.execute<NewUserCommand, User>(
         command,
       );
 

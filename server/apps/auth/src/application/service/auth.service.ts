@@ -79,6 +79,26 @@ export class AuthService {
     }
   }
 
+  async newUser(request: any) {
+    try {
+      const result = await lastValueFrom(
+        this.rmqService
+          .send('new_user', {
+            request,
+          })
+          .pipe(
+            catchError((error) => throwError(() => new RpcException(error))),
+          ),
+      );
+
+      return result;
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+    }
+  }
+
   async validateUserCredentials(email: string, password: string) {
     const user = await this.checkUser(email);
 

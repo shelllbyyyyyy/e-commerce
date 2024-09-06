@@ -15,8 +15,10 @@ import SubmitButton from "@/components/ui/submit-button";
 import Wrapper from "@/components/providers/wrapper";
 
 import { loginFormSchema, LoginFormSchema } from "@/shared/validations/auth";
+import { useRouter } from "next/navigation";
 
 export const SignIn = () => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useForm<LoginFormSchema>({
     resolver: zodResolver(loginFormSchema),
@@ -32,6 +34,7 @@ export const SignIn = () => {
       setIsLoading(true);
       const result = await fetch("/api/auth/sign-in", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -43,9 +46,24 @@ export const SignIn = () => {
 
       const res = await result.json();
 
-      localStorage.setItem("access_token", res.data);
+      if (res) {
+        router.push("/");
+      }
 
       return res;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const google = async () => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
+      setIsLoading(true);
+
+      location.href = `${baseUrl}/auth/google`;
     } catch (error) {
       console.log(error);
     } finally {
@@ -103,28 +121,31 @@ export const SignIn = () => {
                 >
                   Sign In
                 </SubmitButton>
-                <SubmitButton
-                  className="w-full rounded-md py-5"
-                  isLoading={isLoading}
-                >
-                  <Image
-                    src={"/assets/google.svg"}
-                    height={20}
-                    width={20}
-                    alt="google logo"
-                    className="mr-2"
-                  />
-                  Continue with google
-                </SubmitButton>
-                <Button variant={"link"}>
-                  <Link href={"/auth/sign-up"}>
-                    Don't have an account ?{" "}
-                    <span className="text-red-600">sign up for free</span>
-                  </Link>
-                </Button>
               </div>
             </form>
           </Form>
+          <div className="space-y-3 text-center">
+            <SubmitButton
+              className="w-full rounded-md py-5"
+              isLoading={isLoading}
+              onClick={google}
+            >
+              <Image
+                src={"/assets/google.svg"}
+                height={20}
+                width={20}
+                alt="google logo"
+                className="mr-2"
+              />
+              Continue with google
+            </SubmitButton>
+            <Button variant={"link"}>
+              <Link href={"/auth/sign-up"}>
+                Don't have an account ?{" "}
+                <span className="text-red-600">sign up for free</span>
+              </Link>
+            </Button>
+          </div>
         </section>
         <figure className="w-1/2 flex place-content-end">
           <Image

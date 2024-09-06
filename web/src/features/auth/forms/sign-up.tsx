@@ -22,6 +22,7 @@ import {
 
 export const SignUp = () => {
   const router = useRouter();
+  const [isChecked, setIsChecked] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useForm<RegisterFormSchema>({
     resolver: zodResolver(registerFormSchema),
@@ -35,7 +36,7 @@ export const SignUp = () => {
 
   const signUp: SubmitHandler<RegisterFormSchema> = async (value) => {
     try {
-      setIsLoading(true);
+      setIsChecked(!isChecked);
 
       await fetch("/api/auth/sign-up", {
         method: "POST",
@@ -48,11 +49,28 @@ export const SignUp = () => {
           password: value.password,
         }),
       });
+      router.push(`/auth/send-verification/${value.email}`);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsChecked(!isChecked);
+    }
+  };
+
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
+  };
+
+  const google = async () => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
+      setIsLoading(true);
+
+      location.href = `${baseUrl}/auth/google`;
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
-      router.push(`/auth/send-verification/${value.email}`);
     }
   };
 
@@ -96,37 +114,52 @@ export const SignUp = () => {
                 type="password"
                 placeholder="********"
               />
+              <CustomFormField
+                control={form.control}
+                fieldType={FormFieldType.CHECKBOX}
+                name="eek"
+                label={
+                  <p>
+                    By clicking register, I agree with the{" "}
+                    <span className="text-primary">Terms and Conditions </span>
+                  </p>
+                }
+                onClick={handleCheckboxChange}
+              />
               <div className="space-y-3 text-center">
-                <SubmitButton
+                <Button
                   className="w-full rounded-md py-5"
                   type="submit"
-                  isLoading={isLoading}
+                  disabled={isChecked ? false : true}
                 >
                   Register an account
-                </SubmitButton>
-                <SubmitButton
-                  className="w-full rounded-md py-5"
-                  type="submit"
-                  isLoading={isLoading}
-                >
-                  <Image
-                    src={"/assets/google.svg"}
-                    height={20}
-                    width={20}
-                    alt="google logo"
-                    className="mr-2"
-                  />
-                  Continue with google
-                </SubmitButton>
-                <Button variant={"link"}>
-                  <Link href={"/auth/sign-in"}>
-                    Already have an account ?{" "}
-                    <span className="text-red-600">sign in</span>
-                  </Link>
                 </Button>
               </div>
             </form>
           </Form>
+          <div className="space-y-3 text-center">
+            <SubmitButton
+              className="w-full rounded-md py-5"
+              type="submit"
+              isLoading={isLoading}
+              onClick={google}
+            >
+              <Image
+                src={"/assets/google.svg"}
+                height={20}
+                width={20}
+                alt="google logo"
+                className="mr-2"
+              />
+              Continue with google
+            </SubmitButton>
+            <Button variant={"link"}>
+              <Link href={"/auth/sign-in"}>
+                Already have an account ?{" "}
+                <span className="text-red-600">sign in</span>
+              </Link>
+            </Button>
+          </div>
         </section>
         <figure className="w-1/2 flex place-content-end">
           <Image

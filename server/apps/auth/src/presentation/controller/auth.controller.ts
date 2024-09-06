@@ -19,7 +19,12 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { User } from '@libs/domain';
-import { RmqService, RpcExceptionFilter } from '@libs/shared';
+import {
+  AuthenticatedUser,
+  RmqService,
+  RpcExceptionFilter,
+  RpcRequestHandler,
+} from '@libs/shared';
 
 import { RegisterDTO } from '@/root/auth/dtos/register.dto';
 import { LoginDTO } from '@/root/auth/dtos/login.dto';
@@ -33,6 +38,7 @@ import { VerifyUserCommand } from '@/auth/application/command/verify-user/verify
 import { LocalAuthGuard } from '@/auth/common/guards/local-auth.guard';
 import { CurrentUser } from '@/auth/common/decorators/current.user.decorator';
 import { JwtAuthGuard } from '@/auth/common/guards/jwt-auth.guard';
+import { GoogleCommand } from '@/auth/application/command/login/google.command';
 
 @Controller()
 @UseFilters(new RpcExceptionFilter())
@@ -156,6 +162,30 @@ export class AuthController {
       return verified;
     } catch (error) {
       throw new RpcException(new BadRequestException('User not found'));
+    }
+  }
+
+  @EventPattern('google_login')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async handleGooleLogin(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ): Promise<{ access_token: string; refresh_token: string }> {
+    const rpc = RpcRequestHandler.execute<{ user: AuthenticatedUser }>(data);
+
+    const command = new GoogleCommand(rpc.request);
+
+    try {
+      const verified = await this.command.execute<
+        GoogleCommand,
+        { access_token: string; refresh_token: string }
+      >(command);
+
+      this.rmqService.ack(context);
+
+      return verified;
+    } catch (error) {
+      throw new RpcException(new BadRequestException('Something wrong'));
     }
   }
 

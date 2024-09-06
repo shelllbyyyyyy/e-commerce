@@ -3,7 +3,7 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, lastValueFrom, throwError } from 'rxjs';
 
 import { User } from '@libs/domain';
-import { AUTH_SERVICE } from '@libs/shared';
+import { AUTH_SERVICE, AuthenticatedUser } from '@libs/shared';
 
 import { RegisterDTO } from './dtos/register.dto';
 import { LoginDTO } from './dtos/login.dto';
@@ -17,6 +17,22 @@ export class AuthService {
       return await lastValueFrom(
         this.rmqClient
           .send('register_user', request)
+          .pipe(
+            catchError((error) => throwError(() => new RpcException(error))),
+          ),
+      );
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+    }
+  }
+
+  async checkEmail(param: string): Promise<User> {
+    try {
+      return await lastValueFrom(
+        this.rmqClient
+          .send('check_user', { param })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
           ),
@@ -83,6 +99,22 @@ export class AuthService {
       return await lastValueFrom(
         this.rmqClient
           .send('resend_verification', param)
+          .pipe(
+            catchError((error) => throwError(() => new RpcException(error))),
+          ),
+      );
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+    }
+  }
+
+  async googleLogin(request: AuthenticatedUser) {
+    try {
+      return await lastValueFrom(
+        this.rmqClient
+          .send('google_login', { request: { user: request } })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
           ),

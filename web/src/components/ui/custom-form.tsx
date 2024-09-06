@@ -30,7 +30,7 @@ interface CustomProps {
   control: Control<any>;
   name: string;
   type?: string;
-  label?: string;
+  label?: React.ReactNode;
   className?: string;
   placeholder?: string;
   iconSrc?: string;
@@ -41,6 +41,7 @@ interface CustomProps {
   children?: React.ReactNode;
   renderSkeleton?: (field: any) => React.ReactNode;
   fieldType: FormFieldType;
+  onClick?: () => void;
 }
 
 const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
@@ -86,6 +87,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
               id={props.name}
               checked={field.value}
               onCheckedChange={field.onChange}
+              onClick={props.onClick}
             />
             <label htmlFor={props.name} className="checkbox-label">
               {props.label}

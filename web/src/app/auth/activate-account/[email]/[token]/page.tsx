@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Container from "@/components/providers/container";
+import Wrapper from "@/components/providers/wrapper";
 
 export default function VerifyUser({
   params,
@@ -38,5 +40,11 @@ export default function VerifyUser({
     verifyToken();
   }, [token, router]);
 
-  return <p>{status}</p>;
+  return (
+    <Container>
+      <Wrapper className="w-full h-screen flex justify-center items-center">
+        <h4>{status}</h4>
+      </Wrapper>
+    </Container>
+  );
 }

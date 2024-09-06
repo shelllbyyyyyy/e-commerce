@@ -8,6 +8,7 @@ export class UserMapper {
       username: data.getUsername(),
       email: data.getEmail(),
       password: data.getPassword(),
+      isVerified: data.IsVerified(),
     };
   }
 
