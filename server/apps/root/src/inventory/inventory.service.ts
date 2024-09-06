@@ -38,7 +38,7 @@ export class InventoryService {
         this.rmqService
           .send('get_stock_product', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -64,7 +64,7 @@ export class InventoryService {
           .send('update_stock_product', {
             param,
             request,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

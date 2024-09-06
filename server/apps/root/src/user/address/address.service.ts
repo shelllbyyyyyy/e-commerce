@@ -20,7 +20,7 @@ export class AddressService {
         this.rmqClient
           .send('add_address', {
             request,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -45,7 +45,7 @@ export class AddressService {
           .send('update_address', {
             param,
             request,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -65,7 +65,7 @@ export class AddressService {
         this.rmqClient
           .send('delete_address', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -104,7 +104,7 @@ export class AddressService {
         this.rmqClient
           .send('get_address', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

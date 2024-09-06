@@ -18,7 +18,7 @@ export class UserService {
         this.rmqClient
           .send('get_user_by_id', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -62,7 +62,7 @@ export class UserService {
           .send('update_user', {
             request,
             imageFile,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -82,7 +82,7 @@ export class UserService {
         this.rmqClient
           .send('delete_user', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -105,7 +105,7 @@ export class UserService {
         this.rmqClient
           .send('add_address', {
             request,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -130,7 +130,7 @@ export class UserService {
           .send('update_address', {
             param,
             request,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -150,7 +150,7 @@ export class UserService {
         this.rmqClient
           .send('delete_address', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -189,7 +189,7 @@ export class UserService {
         this.rmqClient
           .send('get_address', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

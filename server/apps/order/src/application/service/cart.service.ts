@@ -17,7 +17,7 @@ export class CartService {
         this.rmqService
           .send('get_cart_items', {
             request,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -41,7 +41,7 @@ export class CartService {
         this.rmqService
           .emit('delete_cart_items', {
             request,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

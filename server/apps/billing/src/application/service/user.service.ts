@@ -33,7 +33,7 @@ export class UserService {
         this.rmqClient
           .send('get_address', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),

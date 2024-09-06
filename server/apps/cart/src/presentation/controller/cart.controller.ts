@@ -95,7 +95,7 @@ export class CartController {
       rpc.user.sub,
       productId,
       quantity,
-      rpc.authorization,
+      rpc.access_token,
     );
 
     try {
@@ -123,7 +123,7 @@ export class CartController {
     const command = new UpdateCartCommand(
       cartItemId,
       quantity,
-      rpc.authorization,
+      rpc.access_token,
     );
 
     try {

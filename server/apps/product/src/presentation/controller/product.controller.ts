@@ -76,7 +76,7 @@ export class ProductController {
       label,
       quantity,
       file,
-      rpc.authorization,
+      rpc.access_token,
     );
 
     try {

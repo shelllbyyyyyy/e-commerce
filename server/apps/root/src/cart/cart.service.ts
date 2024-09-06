@@ -17,7 +17,7 @@ export class CartService {
         this.rmqService
           .send('add_to_cart', {
             request,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -63,7 +63,7 @@ export class CartService {
           .send('update_cart_item', {
             param,
             request,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
@@ -83,7 +83,7 @@ export class CartService {
         this.rmqService
           .send('delete_cart_item', {
             param,
-            authorization: authentication,
+            access_token: authentication,
           })
           .pipe(
             catchError((error) => throwError(() => new RpcException(error))),
