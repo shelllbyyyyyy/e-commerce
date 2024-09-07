@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
-import { RmqModule, AUTH_SERVICE } from '@libs/shared';
+import { RmqModule, AUTH_SERVICE, CookieService } from '@libs/shared';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -24,6 +24,6 @@ import { GoogleStrategy } from './strategies/google.startegy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleOauthGuard, GoogleStrategy],
+  providers: [AuthService, GoogleOauthGuard, GoogleStrategy, CookieService],
 })
 export class AuthModule {}

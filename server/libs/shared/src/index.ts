@@ -5,6 +5,7 @@ export * from './cloudinary/constant';
 export * from './cloudinary/cloudinary.service';
 
 export * from './common/bcrypt';
+export * from './common/compress';
 export * from './common/buffer';
 export * from './common/mapper/to-json.mapper';
 export * from './common/request/rpc.request.handler';

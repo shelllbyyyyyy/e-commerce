@@ -1,9 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-  const url = request.nextUrl.clone();
-
-  const response = NextResponse.redirect(new URL("/", url.origin));
-
-  return response;
+export async function GET(request: Request) {
+  return NextResponse.redirect(process.env.APP_URL as string, { status: 307 });
 }

@@ -5,7 +5,7 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 
-import { AUTH_SERVICE, RmqModule } from '@libs/shared';
+import { AUTH_SERVICE, CookieService, RmqModule } from '@libs/shared';
 
 import { AuthService } from '../auth/auth.service';
 import { RefreshTokenMiddleware } from './middleware.service';
@@ -16,7 +16,7 @@ import { RefreshTokenMiddleware } from './middleware.service';
       name: AUTH_SERVICE,
     }),
   ],
-  providers: [AuthService],
+  providers: [AuthService, CookieService],
 })
 export class RefreshModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

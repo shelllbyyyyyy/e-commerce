@@ -13,6 +13,7 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -25,13 +26,13 @@ import {
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
+import { AuthenticatedUser, CookieService } from '@libs/shared';
+
 import { RegisterDTO } from './dtos/register.dto';
 import { ApiResponse } from './dtos/api-response.dto';
 import { LoginDTO } from './dtos/login.dto';
 import { AuthService } from './auth.service';
-import { ConfigService } from '@nestjs/config';
 import { GoogleOauthGuard } from './guard/google-auth.guard';
-import { AuthenticatedUser } from '@libs/shared';
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -39,6 +40,7 @@ export class AuthController {
   constructor(
     private readonly service: AuthService,
     private readonly configService: ConfigService,
+    private readonly cookieService: CookieService,
   ) {}
 
   @Post('register')
@@ -75,23 +77,9 @@ export class AuthController {
     @Body() dto: LoginDTO,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.service.login(dto);
+    const { access_token, refresh_token } = await this.service.login(dto);
 
-    res.cookie('access_token', result.access_token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 360000,
-      path: '/',
-    });
-
-    res.cookie('refresh_token', result.refresh_token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
-    });
+    await this.cookieService.setCookies(res, access_token, refresh_token);
 
     res.status(HttpStatus.OK).send({ message: 'Login Successfully' });
   }
@@ -180,7 +168,10 @@ export class AuthController {
   async callback(@Req() req: Request, @Res() res: Response) {
     const user = req.user as AuthenticatedUser;
 
-    await this.service.googleLogin(user);
+    const { access_token, refresh_token } =
+      await this.service.googleLogin(user);
+
+    await this.cookieService.setCookies(res, access_token, refresh_token);
 
     const url = `${this.configService.get<string>('CLIENT_URL')}/api/auth/google/callback`;
 

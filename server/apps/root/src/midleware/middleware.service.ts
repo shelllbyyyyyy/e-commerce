@@ -5,10 +5,14 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../auth/auth.service';
+import { CookieService } from '@libs/shared';
 
 @Injectable()
 export class RefreshTokenMiddleware implements NestMiddleware {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cookieService: CookieService,
+  ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
     const refreshToken = req.cookies['refresh_token'];
@@ -19,8 +23,10 @@ export class RefreshTokenMiddleware implements NestMiddleware {
       });
     }
 
+    const token = await this.cookieService.decompressToken(refreshToken);
+
     try {
-      const data = await this.authService.refresh(refreshToken);
+      const data = await this.authService.refresh(token);
 
       res.cookie('access_token', data.access_token, {
         httpOnly: true,
