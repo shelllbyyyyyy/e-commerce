@@ -9,10 +9,10 @@ export default function UserLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <React.Fragment>
+    <>
       <NavigationBar />
       {children}
       <Footer />
-    </React.Fragment>
+    </>
   );
 }

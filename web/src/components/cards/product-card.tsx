@@ -16,8 +16,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   return (
     <div className=" flex flex-col h-auto gap-5">
-      <figure className="relative aspect-square bg-background border shadow rounded-[20px] w-[295px] h-[298px] overflow-hidden">
-        <Image src={imageUrl} fill alt={name} className="object-center" />
+      <figure className="relative aspect-square bg-background border shadow rounded-[20px]  overflow-hidden">
+        <Image
+          src={imageUrl}
+          fill
+          alt={name}
+          className="object-center"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
+        />
       </figure>
       <span className="space-y-2">
         <h4 className="text-[20px]">{name}</h4>

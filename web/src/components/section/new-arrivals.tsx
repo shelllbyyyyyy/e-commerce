@@ -19,14 +19,14 @@ const getProducts = async (): Promise<ApiResponse<Product[]>> => {
   return result;
 };
 
-export const NewArrival = async () => {
+const NewArrival = async () => {
   const { data } = await getProducts();
 
   return (
     <section id="new-arrival" className="w-full h-auto py-16">
-      <Wrapper className="flex flex-col justify-center items-center gap-14">
+      <Wrapper className="flex flex-col justify-center items-center gap-14 max-w-[1400px] mx-auto">
         <h2 className="uppercase">New Arrival</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
           {data?.map((product: Product) => {
             return (
               <ProductCard
@@ -48,3 +48,5 @@ export const NewArrival = async () => {
     </section>
   );
 };
+
+export default NewArrival;

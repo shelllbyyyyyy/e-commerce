@@ -5,18 +5,20 @@ import { reviews } from "@/shared/constants";
 import Wrapper from "../providers/wrapper";
 import { ReviewCard } from "../cards/review-card";
 
-export const Review = () => {
+const Review = () => {
   return (
-    <section id="review" className="w-full h-auto">
+    <section id="review">
       <Wrapper className="lg:px-0 py-20 space-y-10">
         <div className="flex justify-between">
-          <h3 className="uppercase">Our Customer Happy</h3>
+          <h3 className="uppercase w-full font-black text-md sm:text-xl">
+            Our Customer Happy
+          </h3>
           <span className="flex gap-5">
             <MoveLeft />
             <MoveRight />
           </span>
         </div>
-        <div className="flex gap-5 justify-center">
+        <div className="flex overflow-x-auto space-x-5 scroll-snap-x p-5 hide-scrollbar">
           {reviews.map((review) => {
             return <ReviewCard key={review.name} {...review} />;
           })}
@@ -25,3 +27,5 @@ export const Review = () => {
     </section>
   );
 };
+
+export default Review;

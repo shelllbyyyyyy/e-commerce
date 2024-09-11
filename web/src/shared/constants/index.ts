@@ -102,3 +102,27 @@ export const badges: IBadge[] = [
     imageUrl: "/assets/badge/gpay.svg",
   },
 ];
+
+export interface ISocial {
+  imgUrl: string;
+  link: string;
+}
+
+export const social: ISocial[] = [
+  {
+    imgUrl: "/assets/social/twitter.svg",
+    link: "https://twitter.com/ariframdaniiiiii",
+  },
+  {
+    imgUrl: "/assets/social/facebook.svg",
+    link: "https://www.facebook.com/profile.php?id=100004435728850",
+  },
+  {
+    imgUrl: "/assets/social/instagram.svg",
+    link: "https://instagram.com/ariframdaniiiiii",
+  },
+  {
+    imgUrl: "/assets/social/github.svg",
+    link: "https://github.com/shelllbyyyyyy",
+  },
+];

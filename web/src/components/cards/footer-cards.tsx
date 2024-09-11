@@ -1,4 +1,5 @@
-import { IFooter } from "@/shared/constants";
+import { IFooter, ISocial } from "@/shared/constants";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -15,11 +16,28 @@ export const FooterCard: React.FC<IFooter> = ({
 }) => {
   return (
     <div className="flex flex-col gap-3 text-muted-foreground">
-      <p className="font-bold uppercase mb-5 text-primary">{title}</p>
+      <p className="font-bold uppercase mb-2 text-primary">{title}</p>
       <Link href={href1}>{link1}</Link>
       <Link href={href2}>{link2}</Link>
       <Link href={href3}>{link3}</Link>
       <Link href={href4}>{link4}</Link>
     </div>
+  );
+};
+
+export const FooterSocial: React.FC<ISocial> = ({ imgUrl, link }) => {
+  return (
+    <Link href={link}>
+      <Image
+        src={imgUrl}
+        width={28}
+        height={28}
+        alt="social"
+        style={{
+          width: "auto",
+          height: "auto",
+        }}
+      />
+    </Link>
   );
 };

@@ -18,14 +18,14 @@ const getProducts = async (): Promise<ApiResponse<Product[]>> => {
   return result;
 };
 
-export const TopSelling = async () => {
+const TopSelling = async () => {
   const { data } = await getProducts();
 
   return (
     <section id="top-selling" className="w-full h-auto pb-16">
       <Wrapper className="flex flex-col justify-center items-center gap-14">
         <h2 className="uppercase">Top Selling</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
           {data?.map((product: Product) => {
             return (
               <ProductCard
@@ -45,3 +45,5 @@ export const TopSelling = async () => {
     </section>
   );
 };
+
+export default TopSelling;

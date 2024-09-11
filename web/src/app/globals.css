@@ -1,3 +1,13 @@
+/* CSS untuk menyembunyikan scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Sembunyikan scrollbar di browser berbasis WebKit */
+}
+
+/* Tetap memungkinkan scroll */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
